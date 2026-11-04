@@ -4,6 +4,7 @@ Company website for Carbon AI Labs, served by GitHub Pages at https://carbonaila
 
 - `index.html` – the whole site (one page)
 - `assets/` – logo, favicon and app icons
+- `assets/analytics.js` – Microsoft Clarity visitor counter (paste the project ID at the top)
 - `CNAME` – custom domain for GitHub Pages
 
 To change wording, edit `index.html` and commit. The site updates within a minute or two.
