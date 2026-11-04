@@ -1,7 +1,7 @@
 // Visitor counts with Microsoft Clarity (clarity.microsoft.com). Paste the project ID from
 // Clarity > Settings > Overview between the quotes. Left empty, nothing loads and nothing is counted.
 // If you change what this collects, update "Website visitors" in privacy.html too.
-var CLARITY_ID = "";
+var CLARITY_ID = "z8ckjy8zh1";
 
 if (CLARITY_ID) {
   (function (c, l, a, r, i, t, y) {
