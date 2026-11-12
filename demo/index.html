@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coach AI | Free live demo | Carbon AI Labs</title>
+<meta name="description" content="Try Coach AI free, no sign-up. Plans, check-ins and client chat for fitness coaches, run by AI. By Carbon AI Labs.">
+<meta name="theme-color" content="#1C1B1F">
+<!-- Link preview (WhatsApp, Instagram, LinkedIn, X, Telegram). Image must stay 1200x630 and use an absolute URL. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Carbon AI Labs">
+<meta property="og:title" content="Coach AI | Free live demo">
+<meta property="og:description" content="Plans, check-ins and client chat for fitness coaches, run by AI. Try it now, no sign-up.">
+<meta property="og:url" content="https://carbonailabs.in/demo/">
+<meta property="og:image" content="https://carbonailabs.in/assets/coach-ai-demo-preview.png">
+<meta property="og:image:secure_url" content="https://carbonailabs.in/assets/coach-ai-demo-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Carbon AI Labs: Coach AI, free live demo, no sign-up">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Coach AI | Free live demo">
+<meta name="twitter:description" content="Plans, check-ins and client chat for fitness coaches, run by AI. Try it now, no sign-up.">
+<meta name="twitter:image" content="https://carbonailabs.in/assets/coach-ai-demo-preview.png">
+<link rel="canonical" href="https://carbonailabs.in/demo/">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=JetBrains+Mono:wght@500&family=Public+Sans:wght@400;600&display=swap">
+<script src="/assets/analytics.js" defer></script>
+<style>
+:root{--carbon:#1C1B1F;--crimson:#B3261E;--crimson-lit:#E0453A;--on-dark:#F3EEEE;--on-dark-2:#B9B1B3;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--carbon);color:var(--on-dark);font:400 1.0625rem/1.6 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:center;min-height:100vh;min-height:100dvh;padding:2rem 1rem;border-bottom:8px solid var(--crimson)}
+main{max-width:32rem;text-align:center}
+.logo{height:44px;width:auto}
+.eyebrow{margin:2.5rem 0 .75rem;font:500 .8rem/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--crimson-lit)}
+h1{font:800 clamp(2.6rem,10vw,3.6rem)/1 "Archivo",system-ui,sans-serif;margin:0;letter-spacing:-.02em}
+p{color:var(--on-dark-2);margin:1rem 0 2rem}
+.btn{display:inline-block;background:var(--crimson);color:#fff;font-weight:600;text-decoration:none;padding:1rem 1.6rem;border-radius:6px}
+.btn:hover,.btn:focus-visible{background:var(--crimson-lit)}
+.note{font-size:.85rem;margin:1.25rem 0 0}
+.note a{color:var(--on-dark)}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="/assets/logo-dark.svg" alt="Carbon AI Labs" width="172" height="44">
+  <div class="eyebrow">Free live demo · No sign-up</div>
+  <h1>Coach AI</h1>
+  <p id="status">Opening the demo for you…</p>
+  <a class="btn" id="go" href="https://carbon-coachai.streamlit.app/coach?demo=1">Open the Coach AI demo</a>
+  <p class="note">Nothing you enter is saved. <a href="/">About Carbon AI Labs</a></p>
+</main>
+<script>
+// Link-preview bots read the tags above and never run this, so the shared link keeps our preview.
+// People are sent on to the live demo after a moment (long enough for the visit to be counted).
+(function () {
+  var target = document.getElementById("go").href;
+  setTimeout(function () { location.replace(target); }, 1200);
+})();
+</script>
+</body>
+</html>
