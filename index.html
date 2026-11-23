@@ -55,7 +55,30 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .top nav{display:flex;gap:1.5rem;font-weight:500;font-size:.95rem}
 .top nav a{text-decoration:none}
 .top nav a:hover{color:var(--crimson)}
-@media (max-width:560px){.top nav a:not(.cta-link){display:none}.top img{height:38px}}
+@media (max-width:560px){.top nav{gap:.9rem}.top nav a:not(.cta-link):not(.studio-link){display:none}.top img{height:38px}}
+
+/* Carbon AI Studio entry: its own black + yellow theme */
+.top nav .studio-link{display:inline-flex;align-items:center;gap:.45rem;background:#08080A;color:#F5C518;padding:.45rem .85rem;border-radius:999px;font-weight:600;white-space:nowrap}
+.top nav .studio-link::before{content:"";width:7px;height:7px;border-radius:50%;background:#F5C518;flex:none}
+.top nav .studio-link:hover{color:#FFFFFF}
+.studio-band{position:relative;overflow:hidden;background:#08080A;color:#F2F0EA}
+.studio-band .wrap{position:relative;padding-block:3.5rem;display:grid;grid-template-columns:1.3fr 1fr;gap:2rem;align-items:center}
+.studio-band .lat{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.studio-band .tagline{font:600 .75rem/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",var(--body);letter-spacing:.08em;text-transform:uppercase;color:#F5C518;display:flex;align-items:center;gap:.6rem}
+.studio-band .tagline::before{content:"";width:9px;height:9px;border-radius:50%;background:#E0453A}
+.studio-band h2{font:800 clamp(2.6rem,8vw,4.6rem)/.92 -apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",var(--display);letter-spacing:-.05em;color:#FFFFFF;margin:1rem 0 1rem}
+.studio-band h2 span{color:#F5C518}
+.studio-band p{color:#C9C6BE;max-width:34rem;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",var(--body)}
+.studio-band p b{color:#FFFFFF}
+.studio-band .side{display:flex;flex-direction:column;gap:.8rem;align-items:flex-start}
+.studio-band .side ul{list-style:none;margin:0 0 .6rem;padding:0;display:flex;flex-direction:column;gap:.45rem;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",var(--body)}
+.studio-band .side li{display:flex;gap:.6rem;align-items:baseline}
+.studio-band .side li::before{content:"";width:6px;height:6px;background:#F5C518;transform:rotate(45deg);flex:none;position:relative;top:-.15em}
+.studio-band .go{display:inline-flex;align-items:center;gap:.5rem;background:#F5C518;color:#0B0B0C;text-decoration:none;font-weight:700;padding:.9rem 1.4rem;border-radius:999px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",var(--body)}
+.studio-band .go:hover{background:#FFD24D}
+.studio-band .go:focus-visible{outline-color:#F5C518}
+@media (max-width:760px){.studio-band .wrap{grid-template-columns:1fr}}
+@media (max-width:430px){.top .wrap{gap:.5rem}.top img{height:32px!important}.top nav{gap:.7rem!important;font-size:.85rem}.top nav .studio-link{padding:.4rem .7rem;gap:.35rem}}
 
 /* hero */
 .hero .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:3rem;align-items:center;padding-block:5rem 4.5rem}
@@ -153,6 +176,7 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
   <div class="wrap">
     <a href="#top" aria-label="Carbon AI Labs home"><img src="assets/logo-light.svg" alt="Carbon AI Labs" width="173" height="44"></a>
     <nav aria-label="Main">
+      <a href="/carbon-ai-studio/" class="studio-link">Carbon AI Studio</a>
       <a href="#products">Products</a>
       <a href="#services">Services</a>
       <a href="#about">About</a>
@@ -181,6 +205,25 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
             <circle cx="52.8" cy="32" r="5.5" fill="#B3261E"/>
           </g>
         </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="studio-band" id="studio" aria-labelledby="studio-title">
+    <svg class="lat" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><defs><pattern id="studiohex" width="51.96" height="90" patternUnits="userSpaceOnUse"><path d="M25.98 0 L51.96 15 L51.96 45 L25.98 60 L0 45 L0 15 Z M25.98 60 L25.98 90" fill="none" stroke="#F5C518" stroke-width="0.8"/></pattern><radialGradient id="studiofade" cx="85%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="studiomask"><rect width="100%" height="100%" fill="url(#studiofade)"/></mask></defs><rect width="100%" height="100%" fill="url(#studiohex)" opacity=".1" mask="url(#studiomask)"/></svg>
+    <div class="wrap">
+      <div>
+        <span class="tagline">New from Carbon AI Labs</span>
+        <h2 id="studio-title">Carbon <span>AI Studio</span></h2>
+        <p><b>AI avatar videos for modern brands.</b> No models, no cameras, no studio. Lifelike AI presenters who speak for your business, made as one-off projects with no subscriptions.</p>
+      </div>
+      <div class="side">
+        <ul>
+          <li>Avatar videos with an AI presenter</li>
+          <li>Brand avatars of you or a brand character</li>
+          <li>Script consulting for your business</li>
+        </ul>
+        <a class="go" href="/carbon-ai-studio/">Visit Carbon AI Studio <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
