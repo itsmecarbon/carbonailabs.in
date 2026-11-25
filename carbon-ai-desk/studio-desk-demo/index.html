@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08080A">
+<meta name="description" content="Studio Desk sample dashboard: bookings, payments, deliveries and team planning for photography studios. Carbon AI Desk by Carbon AI Labs.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<title>Poetic Pictures · Studio Desk by Carbon AI Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: sticky studio header with 3 tabs (inputs → client desk → team desk); each desk opens with a to-do strip, then calendar, then detail tables */
+/* Carbon AI Studio look: black ground, sky blue accent, Apple system type, hex-grid watermark. Single dark look by design. */
+:root{
+  color-scheme:dark;
+  --bg:#08080A; --surface:#121215; --sunk:#1B1B20; --ink:#F2F0EA; --muted:#A19E96; --line:#26262C;
+  --plum:#38BDF8; --plum-soft:#0D2633; --marigold:#38BDF8; --marigold-soft:#0D2633; --crimson-deep:#0284C7; --silver:#C9C6BE;
+  --good:#4CC38A; --good-soft:#10291D; --warn:#F0B03F; --warn-soft:#2E220C; --bad:#FF6B5E; --bad-soft:#331312;
+  --t-wed:#38BDF8; --t-rec:#B48AE6; --t-eng:#34D399; --t-hal:#E4CB4A; --t-pre:#E97BA8; --t-oth:#8E96A3;
+  --f-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  --f-mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.03em;color:#fff}
+h2{font-size:2.4rem;font-weight:800;line-height:1.02;letter-spacing:-.045em}
+h3{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+.num,td.n,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.intro .eyebrow{color:var(--plum);display:flex;align-items:center;gap:8px}
+.intro .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--plum)}
+.bars-acc{display:flex;gap:8px;margin-top:12px}.bars-acc i{height:5px;width:56px;background:var(--plum)}.bars-acc i+i{width:16px;background:var(--ink)}
+
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(8,8,10,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand svg{width:34px;height:34px;flex:none}
+.brand h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
+.brand h1 span{color:var(--plum)}
+.brand small{display:block;color:var(--muted);font-size:.75rem}
+.today{font-size:.78rem;color:var(--muted);border:1px solid var(--line);padding:6px 14px;border-radius:99px}.today b{color:var(--ink)}
+nav.tabs{display:flex;gap:4px;overflow-x:auto}
+nav.tabs a{padding:10px 14px;border-bottom:3px solid transparent;color:var(--muted);text-decoration:none;font-weight:600;white-space:nowrap;font-size:.9rem}
+nav.tabs a[aria-current="page"]{color:var(--ink);border-color:var(--marigold)}
+nav.tabs a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+nav.tabs .step{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--sunk);font-size:.72rem;margin-right:6px}
+nav.tabs a[aria-current="page"] .step{background:var(--plum);color:#fff}
+
+main{padding-block:36px 64px;position:relative}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='51.96' height='90'%3E%3Cpath d='M25.98 0 L51.96 15 L51.96 45 L25.98 60 L0 45 L0 15 Z M25.98 60 L25.98 90' fill='none' stroke='%2338BDF8' stroke-width='0.8'/%3E%3C/svg%3E");-webkit-mask-image:radial-gradient(circle at 85% 10%,#000,transparent 60%);mask-image:radial-gradient(circle at 85% 10%,#000,transparent 60%)}
+footer.site{border-top:1px solid var(--line);padding-block:18px;color:var(--muted);font-size:.78rem}
+footer.site .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+footer.site b{color:var(--ink);font-weight:600}
+footer.site svg{width:14px;height:14px;vertical-align:-2px;margin-right:6px}
+section.page{display:grid;gap:20px}
+.split{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
+.sidenav{position:sticky;top:120px;display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid var(--line,rgba(255,255,255,.08));border-radius:16px;background:rgba(255,255,255,.02)}
+.sidenav button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:10px;font-size:.88rem;color:var(--silver,#aaa);border-left:3px solid transparent}
+.sidenav button:hover{background:rgba(255,255,255,.04);color:#fff}
+.sidenav button:focus-visible{outline:2px solid var(--plum);outline-offset:1px}
+.sidenav button[aria-current="true"]{background:rgba(56,189,248,.12);color:#fff;border-left-color:var(--plum);font-weight:600}
+.sidenav .cnt{font-size:.72rem;min-width:20px;text-align:center;padding:1px 7px;border-radius:999px;background:var(--plum);color:#fff;font-weight:600}
+.panes{min-width:0}
+.bilink{display:inline-block;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--plum);text-decoration:none}
+.bilink:hover{text-decoration:underline}
+.bicard{border:1.5px solid var(--plum);background:linear-gradient(180deg,rgba(56,189,248,.10),rgba(56,189,248,.02) 60%),var(--surface);scroll-margin-top:130px}
+.bicard header h3{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bicost{font-size:.75rem;font-weight:700;color:#fff;background:var(--plum);padding:4px 10px;border-radius:99px;white-space:nowrap}
+.bigrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.bi{background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative}
+.bi::before{content:"";position:absolute;left:16px;top:0;width:24px;height:3px;background:var(--plum)}
+.bih{font-weight:700;color:#fff;font-size:.92rem}
+.bi ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:.82rem}
+@media (max-width:900px){.bigrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.bigrid{grid-template-columns:minmax(0,1fr)}}
+
+.lvform{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lvcal .chip.lv{background:var(--silver);color:#0B0B0C}
+.lvcal .chip.lv.cl{background:#fff;color:#B3261E;box-shadow:inset 0 0 0 2px #FF3B30;font-weight:700}
+.lvcal .day.many{box-shadow:inset 0 0 0 1px var(--warn)}
+.lvh{margin:18px 0 8px;font-size:.9rem}
+.lvlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lvlist li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 12px;background:var(--sunk);border-radius:10px;font-size:.85rem}
+.lvlist li>*{min-width:0}
+.lvlist .x{all:unset;cursor:pointer;color:var(--muted);font-size:.78rem;padding:4px 8px;border-radius:6px;border:1px solid var(--line)}
+.lvlist .x:hover{color:var(--bad);border-color:var(--bad)}
+.lvlist .x:focus-visible{outline:2px solid var(--plum)}
+@media (max-width:620px){.lvform{grid-template-columns:minmax(0,1fr)}.lvlist li{grid-template-columns:minmax(0,1fr) auto}.lvlist li .when{grid-column:1/-1;order:3}.lvcal .chip.lv{font-size:0;padding:0;height:6px;border-radius:3px}}
+
+.mapsum{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.mapsum button{all:unset;cursor:pointer;font-size:.8rem;padding:6px 12px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.mapsum button b{color:var(--ink);margin-left:4px}
+.mapsum button[aria-pressed="true"]{border-color:var(--plum);color:var(--ink);background:rgba(56,189,248,.12)}
+.mapsum button:focus-visible{outline:2px solid var(--plum)}
+.maplist{display:grid;gap:12px}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--sunk)}
+.mhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:30px}
+.mhead b{font-size:.98rem}.mhead .muted{font-size:.78rem}
+.mhead .where{margin-left:auto;font-size:.78rem;color:var(--ink)}.mhead .where em{font-style:normal;color:var(--plum);font-weight:600}
+.road{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(0,2fr);position:relative}
+.stop{position:relative;padding-right:10px;min-width:0}
+.stop::before{content:"";position:absolute;top:10px;left:22px;right:0;height:3px;background:var(--line)}
+.stop.done::before{background:var(--plum)}
+.stop.goal::before{display:none}
+.dot{position:relative;z-index:1;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:inset 0 0 0 2px var(--line);font-size:.7rem;color:#fff;font-weight:700}
+.stop.done .dot{background:var(--plum);box-shadow:none}
+.stop.now .dot{background:#fff;box-shadow:0 0 0 4px rgba(56,189,248,.45)}
+.stop.late .dot{background:var(--bad-soft);box-shadow:inset 0 0 0 2px var(--bad)}
+.stop.now.late .dot{background:#fff;box-shadow:0 0 0 4px rgba(255,107,94,.55)}
+.here{position:absolute;top:-22px;left:-4px;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--plum);white-space:nowrap}
+.stop .nm{margin-top:8px;font-size:.82rem;font-weight:600}
+.stop .dt{font-size:.74rem;color:var(--muted)}
+.stop .ex{font-size:.74rem;color:var(--muted)}
+.stop.late .ex,.stop.late .dt{color:var(--bad)}
+.goal .flag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--surface);box-shadow:inset 0 0 0 2px var(--line);font-size:.75rem}
+.goal.done .flag{background:var(--good);box-shadow:none;color:#08080A}
+.out{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.out span{font-size:.72rem;padding:3px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.out span.ok{border-color:transparent;background:var(--good-soft);color:var(--good)}
+.out span.lt{border-color:var(--bad);color:var(--bad)}
+.mcard{padding-top:26px}
+@media (max-width:620px){.mhead{margin-bottom:16px}.road{grid-template-columns:minmax(0,1fr)}.stop{padding:0 0 16px 34px;padding-right:0}.stop::before{top:22px;left:10px;right:auto;bottom:0;width:3px;height:auto}.dot,.goal .flag{position:absolute;left:0;top:0}.stop .nm{margin-top:1px}.here{position:static;display:block;margin-bottom:2px}.mcard{padding-top:16px}}
+
+@media (max-width:760px){.split{grid-template-columns:minmax(0,1fr)}.sidenav{position:static;flex-direction:row;overflow-x:auto;padding:6px;scrollbar-width:none}.sidenav button{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;flex:none}.sidenav button[aria-current="true"]{border-bottom-color:var(--plum)}}
+
+.intro{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.intro p{margin:4px 0 0;max-width:68ch;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.card > header{position:static;background:none;border:0;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px}
+.grid2e{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:900px){.grid2,.grid2e{grid-template-columns:minmax(0,1fr)}}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative}
+.kpi::before{content:"";position:absolute;left:18px;top:0;width:28px;height:3px;background:var(--plum)}
+.kpi .v{font-family:var(--f-display);font-size:1.7rem;font-weight:800;letter-spacing:-.04em;margin-top:6px;font-variant-numeric:tabular-nums;color:#fff}
+.kpi .s{font-size:.78rem;color:var(--muted)}
+.kpi.alert .v{color:var(--bad)}
+.kpi.ok .v{color:var(--good)}
+
+/* to-do strip */
+.todo{display:grid;gap:8px}
+.todo li{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--sunk)}
+.todo ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.todo li>*{min-width:0}
+@media (max-width:620px){.paytbl th:nth-child(3),.paytbl th:nth-child(4),.paytbl td:nth-child(3),.paytbl td:nth-child(4){display:none}.paytbl td:first-child{white-space:nowrap}}
+@media (max-width:620px){.todo li{grid-template-columns:minmax(0,1fr);gap:4px}.todo li .pill{justify-self:start}}
+.todo .when{font-family:var(--f-mono);font-size:.78rem;white-space:nowrap;color:var(--muted)}
+.pill{display:inline-block;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap}
+.p-bad{background:var(--bad-soft);color:var(--bad)} .p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-good{background:var(--good-soft);color:var(--good)} .p-info{background:#26262C;color:#F2F0EA}
+.p-mute{background:var(--sunk);color:var(--muted)}
+
+/* calendar */
+.calnav{display:flex;gap:8px;align-items:center}
+.calnav button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:1rem}
+.calnav button:hover{background:var(--sunk)}
+.calnav strong{min-width:130px;text-align:center;font-family:var(--f-display);color:#fff}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .dow{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center;padding-bottom:4px}
+.cal .day{min-height:92px;background:var(--sunk);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.cal .day.out{opacity:.35}
+.cal .day.today{outline:2px solid var(--plum)}
+.cal .dn{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.chip{font-size:.68rem;line-height:1.25;padding:2px 5px;border-radius:4px;color:#0B0B0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.chip.dl{background:transparent!important;border:1px dashed currentColor;color:var(--ink)}
+.chip.dl.over{color:var(--bad)}
+.t-wed{background:var(--t-wed);color:#0B0B0C} .t-rec{background:var(--t-rec);color:#0B0B0C} .t-eng{background:var(--t-eng);color:#0B0B0C}
+.t-hal{background:var(--t-hal);color:#0B0B0C} .t-pre{background:var(--t-pre);color:#0B0B0C} .t-oth{background:var(--t-oth);color:#0B0B0C}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+@media (max-width:560px){.cal .day{min-height:56px}.cal .chip{font-size:0;padding:0;height:6px;border-radius:3px}.cal .chip.dl{height:6px}}
+
+/* upcoming */
+.upc{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.upc li{display:grid;grid-template-columns:54px 1fr;gap:12px;align-items:start}
+.datebox{border-radius:8px;text-align:center;padding:6px 0;background:var(--sunk)}
+.datebox b{display:block;font-family:var(--f-display);font-size:1.35rem;font-weight:800;letter-spacing:-.03em;line-height:1;color:#fff}
+.datebox span{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.upc .t{font-weight:600}
+.upc .sub{font-size:.8rem;color:var(--muted)}
+.count{font-family:var(--f-mono);font-size:.75rem}
+
+/* tables */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.prog{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;min-width:70px}
+.prog i{display:block;height:100%;background:var(--good)}
+
+/* bars */
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(110px,170px) 1fr auto;gap:10px;align-items:center;font-size:.82rem}
+.bar .track{height:14px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.bar .track i{display:block;height:100%;border-radius:4px}
+.bar .v{font-family:var(--f-mono);font-size:.78rem;min-width:72px;text-align:right}
+
+/* availability grid */
+.avail{overflow-x:auto}
+.avail table{font-size:.72rem;min-width:1000px}
+.avail th,.avail td{padding:4px;border:1px solid var(--line);text-align:center}
+.avail th.who,.avail td.who{text-align:left;position:sticky;left:0;background:var(--surface);min-width:170px;z-index:1}
+.avail td.who b{display:block;font-size:.8rem}
+.avail td.who span{color:var(--muted)}
+.avail th.wk{color:var(--muted)}
+.avail th.tod{background:var(--plum);color:#fff}
+.slot{border-radius:4px;padding:3px 2px;font-weight:600;line-height:1.2}
+.slot.leave{background:var(--sunk);color:var(--muted);font-weight:500}
+.slot.clash{background:#fff;color:#B3261E;box-shadow:inset 0 0 0 2px #FF3B30}
+.slot.due{background:transparent;border:1px dashed var(--plum);color:var(--plum);font-weight:500}
+
+/* team cards */
+.team{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.member{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start}
+.member .top{display:flex;gap:10px;align-items:center}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;background:var(--plum-soft);color:#7DD3FC;border:1px solid var(--plum);flex:none}
+.member .role{font-size:.78rem;color:var(--muted)}
+.member .row{display:flex;justify-content:space-between;font-size:.8rem;gap:8px}
+.load{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.load i{display:block;height:100%}
+
+/* inputs page */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch}
+.flow .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.flow .box ul{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:.85rem}
+.flow .box.mid{background:transparent;border:0;border-radius:0;position:relative;padding:22px}
+.flow .box.mid::before,.flow .box.mid::after{content:"";position:absolute;width:28px;height:28px;border:2px solid var(--plum)}
+.flow .box.mid::before{left:0;top:0;border-right:0;border-bottom:0}
+.flow .box.mid::after{right:0;bottom:0;border-left:0;border-top:0}
+.flow .box.mid .eyebrow{color:var(--plum)}
+.flow .arrow{display:grid;place-items:center;color:var(--marigold);font-size:1.6rem;font-weight:700}
+@media (max-width:860px){.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg)}}
+.rules{display:grid;gap:6px;margin-top:8px;font-size:.85rem}
+.rules div{display:flex;gap:8px}
+.rules b{color:#fff;min-width:80px}
+
+form.add{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+form.add label{display:grid;gap:4px;font-size:.8rem;font-weight:600}
+form.add input,form.add select{font:inherit;font-weight:400;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
+form.add input:focus,form.add select:focus{border-color:var(--plum)}
+.checks input{accent-color:var(--plum)}
+fieldset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;grid-column:1/-1;margin:0}
+legend{font-size:.8rem;font-weight:600;padding:0 4px}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px 14px}
+.checks label{display:flex!important;gap:8px;align-items:center;font-weight:400!important;grid-template-columns:none}
+.checks input{width:auto!important}
+.checks .pr{margin-left:auto;font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.quote{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;background:var(--plum);color:#fff;border-radius:14px;padding:16px 18px}
+.quote .eyebrow,.quote .muted{color:rgba(255,255,255,.8)!important}
+.quote .big{font-family:var(--f-display);font-size:1.9rem;font-weight:800;letter-spacing:-.04em}
+.quote .btn{background:#0B0B0C;color:#fff}
+.btn{font:inherit;font-weight:600;background:var(--plum);color:#fff;border:0;border-radius:999px;padding:11px 22px;cursor:pointer;min-height:44px}
+.btn:hover{filter:brightness(1.1)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;color:#0B0B0C;border-left:4px solid var(--plum);padding:10px 16px;border-radius:10px;font-size:.85rem;z-index:20;max-width:calc(100% - 32px)}
+.assign{display:grid;gap:12px}
+.ashoot{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:12px;background:var(--bg)}
+.ashoot .hd2{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.ashoot .hd2 .when{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.ashoot .hd2 .st{margin-left:auto}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.slots label,.crewpick label{display:grid;gap:4px;font-size:.75rem;font-weight:600;color:var(--muted)}
+.slots select,.crewpick select{font:inherit;font-size:.85rem;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:40px;width:100%}
+.slots select.empty,.crewpick select.empty{border-color:var(--warn);color:var(--warn)}
+.slots select.bad{border-color:var(--bad);color:var(--bad)}
+.slots select:focus,.crewpick select:focus{border-color:var(--plum);outline:none}
+.crewpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.note.promo{background:rgba(56,189,248,.12);border:1.5px solid var(--plum);border-left:5px solid var(--plum);color:#F2F0EA;font-size:.85rem;padding:12px 14px;border-radius:10px}
+.note.promo b{color:#fff;display:block;margin:6px 0 2px;font-size:.95rem}
+.tagc{display:inline-block;background:var(--plum);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px}
+.payform{align-items:end}
+.payhint{grid-column:1/-1;font-size:.82rem;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.payhint b{color:#fff}
+.payact{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.note{font-size:.8rem;color:var(--muted);background:var(--sunk);border-radius:8px;padding:10px 12px}
+tr.new td{background:var(--plum-soft)}
+@media (prefers-reduced-motion:no-preference){.kpi,.card{transition:border-color .2s}}
+
+/* ================= iOS-style layer: simpler, calmer, rounder ================= */
+:root{
+  --bg:#000; --surface:#1C1C1E; --sunk:#2C2C2E; --ink:#F5F5F7; --muted:rgba(235,235,245,.6); --line:rgba(84,84,88,.45);
+  --plum:#38BDF8; --marigold:#38BDF8; --plum-soft:rgba(56,189,248,.16);
+  --good:#30D158; --good-soft:rgba(48,209,88,.16); --warn:#FF9F0A; --warn-soft:rgba(255,159,10,.16); --bad:#FF453A; --bad-soft:rgba(255,69,58,.16);
+  --silver:#D1D1D6; --r:18px; --ease:cubic-bezier(.2,.8,.2,1);
+  --f-mono:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+}
+body{font-size:15px;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+body::after{display:none}
+.num,td.n,.mono{font-variant-numeric:tabular-nums}
+h2{font-size:2.1rem;font-weight:700;letter-spacing:-.03em}
+h3{font-size:1.06rem;font-weight:600;letter-spacing:-.015em}
+.eyebrow{text-transform:none;letter-spacing:0;font-size:.8rem;font-weight:500}
+.bars-acc{display:none}
+
+/* header + segmented tabs */
+header{background:rgba(0,0,0,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line)}
+.hd{padding-block:10px 6px}
+.brand svg{width:40px;height:40px}
+.brand h1{font-size:1.5rem;font-weight:700;letter-spacing:-.025em;line-height:1.15}
+.brand small{font-size:.78rem;margin-top:2px}
+.sidenav .lbl{display:flex;align-items:center;gap:10px}
+.sidenav .ic{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:7px;background:var(--sunk);color:var(--plum)}
+.sidenav .ic svg{width:16px;height:16px}
+.sidenav button[aria-current="true"] .ic{background:rgba(255,255,255,.22);color:#fff}
+.today{border:0;background:var(--surface);padding:6px 12px;font-size:.8rem}
+header > .wrap:last-child{display:flex;justify-content:center;padding-bottom:10px}
+nav.tabs{display:inline-flex;gap:2px;background:var(--surface);padding:3px;border-radius:11px;position:relative}
+nav.tabs a{border:0;padding:7px 22px;border-radius:9px;font-size:.88rem;font-weight:500;color:var(--muted);transition:background .25s var(--ease),color .25s var(--ease)}
+nav.tabs a[aria-current="page"]{background:#3A3A3C;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+nav.tabs .step{display:none}
+
+/* page frame */
+main{padding-block:26px 56px}
+section.page{gap:18px}
+section.page:not([hidden]){animation:pageIn .35s var(--ease)}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.intro{align-items:flex-end}
+.intro p{font-size:.95rem;margin-top:2px}
+.savebar{font-size:.8rem;gap:8px}
+
+/* cards */
+.card,.kpi,.flow .box{border:0;border-radius:var(--r);background:var(--surface)}
+.card{padding:18px 20px}
+.card > header{position:static;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:0}
+
+/* KPI tiles */
+.kpis{gap:12px}
+.kpi{padding:16px 18px}
+.kpi::before{display:none}
+.kpi .l,.kpi .lbl,.kpi > div:first-child{text-transform:none;letter-spacing:0}
+.kpi .v{font-family:var(--f-display);font-weight:700;font-size:1.75rem;letter-spacing:-.03em}
+
+/* left menu = iOS inset grouped list */
+@media (min-width:761px){.split{grid-template-columns:230px minmax(0,1fr);gap:22px}}
+.sidenav{top:132px;border:0;background:var(--surface);border-radius:14px;padding:6px;gap:0}
+.sidenav button{border-left:0!important;border-radius:10px;padding:11px 12px;font-size:.92rem;color:var(--ink);transition:background .2s var(--ease),color .2s var(--ease)}
+.sidenav button + button{box-shadow:inset 0 .5px 0 var(--line)}
+.sidenav button[aria-current="true"]{background:var(--plum);color:#fff;font-weight:600;box-shadow:none}
+.sidenav button[aria-current="true"] + button{box-shadow:none}
+.sidenav button[aria-current="true"] .cnt{background:#fff;color:var(--plum)}
+.sidenav .cnt{background:var(--plum);font-size:.75rem;padding:1px 8px}
+.pane:not([hidden]){animation:paneIn .3s var(--ease)}
+@keyframes paneIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+.pane[data-sec="how"]{display:grid;gap:18px}
+
+/* tables: quiet headers, hairline rows */
+th{text-transform:none;letter-spacing:0;font-size:.78rem;font-weight:500;border-bottom:.5px solid var(--line)}
+td{border-bottom:.5px solid var(--line)!important}
+tbody tr:last-child td{border-bottom:0!important}
+
+/* pills */
+.pill{border-radius:99px;font-weight:600;letter-spacing:0;padding:3px 10px;font-size:.74rem}
+
+/* forms: filled iOS fields */
+form.add label{font-size:.8rem;color:var(--muted);font-weight:500}
+input,select,textarea{background:var(--sunk)!important;border:0!important;border-radius:11px!important;color:var(--ink)!important;min-height:42px;font:inherit;font-size:.95rem!important;transition:box-shadow .2s var(--ease)}
+input:focus,select:focus{outline:0!important;box-shadow:0 0 0 3px rgba(56,189,248,.45)}
+fieldset{border:0!important;background:var(--sunk);border-radius:14px;padding:12px 14px!important}
+.btn{border-radius:12px;font-weight:600;transition:transform .15s var(--ease),filter .2s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{border:0;background:var(--surface);color:var(--plum)}
+.payhint{border:0!important;background:var(--sunk)!important;border-radius:12px!important}
+
+/* calendars & chips */
+.cal .day{border-radius:10px;background:#2C2C2E}
+.cal .day.today{outline:2px solid var(--plum)}
+.chip{border-radius:6px}
+.calnav button{border:0;background:var(--sunk)}
+
+/* client map */
+.mcard{border:0;background:var(--sunk);border-radius:16px}
+.mapsum button{border:0;background:var(--sunk);color:var(--ink)}
+.mapsum button[aria-pressed="true"]{background:var(--plum);color:#fff}
+.mapsum button[aria-pressed="true"] b{color:#fff}
+
+/* team/crew */
+.assign > *,.tcard,.team > *{border-radius:16px!important}
+.ashoot{border:0;background:var(--sunk);border-radius:16px}
+.ashoot select{background:#3A3A3C!important}
+.lvlist li{border-radius:12px}
+
+/* promo + BI in accent blue, softer */
+.note.promo{border:0;border-radius:14px;background:rgba(56,189,248,.12);box-shadow:inset 3px 0 0 var(--plum)}
+.bicard{border:0!important;background:linear-gradient(180deg,rgba(56,189,248,.14),rgba(56,189,248,.03) 60%),var(--surface)!important}
+.bi{border:0;border-radius:14px;background:var(--sunk)}
+.flow .box.mid::before,.flow .box.mid::after{display:none}
+.flow .box.mid{background:var(--surface);border-radius:var(--r);padding:18px}
+.toast{border-radius:14px;border-left:0;background:rgba(44,44,46,.96);color:#fff;backdrop-filter:blur(20px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+
+footer.site{border-top:.5px solid var(--line)}
+
+@media (max-width:760px){
+  .brand svg{width:32px;height:32px}
+  .brand h1{font-size:1.2rem}
+  .sidenav .ic{width:22px;height:22px}
+  .sidenav{border-radius:12px;padding:4px}
+  .sidenav button{border-bottom:0!important;padding:9px 14px}
+  .sidenav button + button{box-shadow:none}
+  nav.tabs{width:100%}
+  nav.tabs a{flex:1;text-align:center;padding:7px 8px}
+  h2{font-size:1.75rem}
+}
+@media (prefers-reduced-motion:reduce){
+  section.page:not([hidden]),.pane:not([hidden]){animation:none}
+  *{transition:none!important}
+}
+
+/* booking form: every row on the same 4-column grid as the fields above */
+form.add fieldset{background:transparent!important;padding:0!important;margin:6px 0 0;min-width:0}
+form.add legend{float:left;width:100%;padding:0;margin:0 0 8px;font-size:.8rem;font-weight:600;color:var(--ink);letter-spacing:0}
+form.add legend + *{clear:both}
+form.add .checks,form.add .crewpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+form.add .checks label{min-height:54px;padding:8px 12px;line-height:1.25;background:var(--sunk);border-radius:11px;font-size:.9rem;color:var(--ink);cursor:pointer;gap:10px;transition:box-shadow .2s var(--ease)}
+form.add .checks label:has(input:checked){box-shadow:inset 0 0 0 1.5px var(--plum)}
+form.add .checks input{min-height:0;width:16px!important;height:16px;margin:0;flex:none}
+form.add .checks .nm{min-width:0}
+form.add .checks .pr{display:block;margin:2px 0 0;font-family:inherit;font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+form.add .crewpick label{font-size:.8rem;font-weight:500;color:var(--muted);gap:4px}
+form.add .crewpick select{background:var(--sunk)!important;min-height:42px;padding:0 12px;font-size:.95rem}
+form.add .quote{margin-top:6px}
+.row>span.muted:first-child{white-space:nowrap;margin-right:12px}
+
+/* Carbon AI Desk palette: black + Sky Blue #38BDF8, black text on blue fills */
+nav.tabs a[aria-current="page"] .step,.sidenav .cnt,.bicost,.avail th.tod,.tagc,.btn,.mapsum button[aria-pressed="true"]{color:#000!important}
+.btn.ghost{color:var(--plum)!important}
+.sidenav button[aria-current="true"]{color:#000!important}
+.sidenav button[aria-current="true"] .ic{background:rgba(0,0,0,.16)!important;color:#000!important}
+.sidenav button[aria-current="true"] .cnt{background:#000!important;color:var(--plum)!important}
+.quote{color:#000!important}
+.quote .eyebrow,.quote .muted{color:rgba(0,0,0,.72)!important}
+.quote .btn{background:#000!important;color:#fff!important}
+.stop.done .dot{color:#000}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <div class="brand"><svg viewBox="0 0 64 64" role="img" aria-label="Carbon AI Labs"><path d="M52.8 20 L32 8 L11.2 20 L11.2 44 L32 56 L52.8 44" fill="none" stroke="#F3EEEE" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="52.8" cy="32" r="5.5" fill="#38BDF8"/></svg><div><h1>Studio <span>Desk</span> · Poetic Pictures</h1><small>Carbon AI Desk · Photography edition · by Carbon AI Labs · sample data</small></div></div>
+    <span class="today">Today: <b id="todayLbl"></b></span>
+  </div>
+  <div class="wrap"><nav class="tabs" aria-label="Pages">
+    <a href="#data">Enter data</a>
+    <a href="#clients">Clients</a>
+    <a href="#team">Team</a>
+  </nav></div>
+</header>
+
+<main class="wrap">
+  <!-- ============ PAGE 1: INPUTS ============ -->
+  <section class="page" id="p-data" hidden>
+    <div class="intro"><div>
+      <h2>Enter data</h2>
+      <p>Type it once here. The Clients and Team pages update themselves.</p>
+    </div><div class="savebar"><span>Saved in this browser</span><button class="btn ghost" type="button" id="resetBtn">Reset sample data</button></div></div>
+    <div class="split" data-split="data">
+      <nav class="sidenav" aria-label="Input sections"></nav>
+      <div class="panes">
+    <div class="card pane" data-sec="pay" data-order="2" data-icon="pay" data-label="Record a payment" id="payCard"><header><h3>Record a payment</h3><span class="muted" style="font-size:.78rem">enter it when money comes in</span></header>
+      <form class="add payform" id="payForm">
+        <label for="pClient">Client<select id="pClient" required></select></label>
+        <label for="pDate">Date received<input id="pDate" type="date" required></label>
+        <label for="pAmt">Amount (₹)<input id="pAmt" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 50000" required></label>
+        <label for="pMode">Paid by<select id="pMode"><option>UPI</option><option>Bank transfer</option><option>Cash</option><option>Cheque</option><option>Card</option></select></label>
+        <label for="pNote">Note (optional)<input id="pNote" placeholder="e.g. second instalment"></label>
+        <div class="payhint" id="pHint"></div>
+        <div class="payact"><button class="btn" type="submit">Record payment</button></div>
+      </form>
+      <div class="tbl paytbl" style="margin-top:14px"><table><thead><tr><th>Date</th><th>Client</th><th>Paid by</th><th>Note</th><th class="n">Amount (₹)</th></tr></thead><tbody id="payRows"></tbody></table></div></div>
+    <div class="card pane" data-sec="book" data-order="1" data-icon="plus" data-label="New booking" id="addCard"><header><h3>New booking</h3><span class="muted" style="font-size:.78rem">quote updates as you tick</span></header>
+      <form class="add" id="addForm">
+        <label for="fName">Client name<input id="fName" required value="Pooja & Nikhil Jain"></label>
+        <label for="fPhone">Phone<input id="fPhone" value="+91 98765 43210"></label>
+        <label for="fType">Event<select id="fType"><option>Wedding</option><option>Reception</option><option>Engagement</option><option>Haldi</option><option>Pre-wedding shoot</option><option>Birthday</option></select></label>
+        <label for="fDate">Event date<input id="fDate" type="date" required value="2026-12-12"></label>
+        <label for="fVenue">Venue<input id="fVenue" value="Clarks Exotica, Devanahalli"></label>
+        <label for="fReels">Number of reels<input id="fReels" type="number" min="0" max="20" value="3"></label>
+        <label for="fAdv">Advance paid (₹)<input id="fAdv" type="number" min="0" step="1000" value="50000"></label>
+        <fieldset><legend>On the event day</legend><div class="checks" id="shootChecks"></div></fieldset>
+        <fieldset><legend>Who will cover it on the day</legend><div class="crewpick" id="crewPick"></div></fieldset>
+        <fieldset><legend>After the event (editing & design)</legend><div class="checks" id="postChecks"></div></fieldset>
+        <div class="quote"><div><div class="eyebrow">Instant quote</div><div class="big num" id="qTotal">₹0</div><div class="muted" style="font-size:.8rem" id="qSplit"></div></div><button class="btn" type="submit">Add booking</button></div>
+      </form>
+      <p class="note" style="margin:12px 0 0">Tip: the sample date 12 Dec already has two weddings. Open the crew dropdowns above and you'll see who is already busy that day, greyed out.</p>
+    </div>
+    <div class="card pane" data-sec="bookings" data-order="3" data-icon="list" data-label="Bookings"><header><h3>Bookings</h3><span class="muted" style="font-size:.78rem">one row per event</span></header>
+      <div class="tbl"><table><thead><tr><th>Client</th><th>Phone</th><th>Event</th><th>Date</th><th>Venue</th><th>Services booked</th></tr></thead><tbody id="bookRows"></tbody></table></div></div>
+      <div class="card pane" data-sec="teamlist" data-order="4" data-icon="team" data-label="Team list"><header><h3>Team list</h3><span class="muted" style="font-size:.78rem">who can do which job</span></header>
+        <div class="tbl"><table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Leave</th></tr></thead><tbody id="teamRows"></tbody></table></div></div>
+      <div class="card pane" data-sec="prices" data-order="5" data-icon="tag" data-label="Price list"><header><h3>Price list</h3><span class="muted" style="font-size:.78rem">set once, edit when prices change</span></header>
+        <div class="tbl"><table><thead><tr><th>Service</th><th>Type</th><th>Charged</th><th class="n">Price (₹)</th><th class="n">Ready in</th></tr></thead><tbody id="priceRows"></tbody></table></div>
+        <p class="note promo" style="margin:14px 0 0"><span class="tagc">Carbon AI Labs</span><b>Not sure your prices are right?</b> Carbon AI Labs also offers a competitive pricing analysis, comparing your rates with other studios in your area, for an additional cost.</p></div>
+    <div class="pane" data-sec="how" data-order="6" data-icon="info" data-label="How it works">
+    <div class="flow">
+      <div class="box"><div class="eyebrow">What you enter</div><h3 style="margin-top:4px">Raw data</h3>
+        <ul><li>Client name, phone, email</li><li>Each event: type, date, venue</li><li>Services booked per event</li><li>Payments received</li><li>Team: name, role, phone, leave days</li></ul></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box mid"><div class="eyebrow">What the dashboard works out</div><h3 style="margin-top:4px">Simple rules</h3>
+        <div class="rules" id="rulesList"></div></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><div class="eyebrow">What you get</div><h3 style="margin-top:4px">Answers, every morning</h3>
+        <ul><li>Who owes money, and by when</li><li>Which edits and albums are late</li><li>Shoot calendar for the month</li><li>Who is working where, each day</li><li>Double bookings flagged early</li></ul>
+        <a class="bilink" href="#biCard">+ BI consultation add-ons ↓</a></div>
+    </div>
+    <div class="card bicard" id="biCard"><header><h3><span class="tagc">Carbon AI Labs</span> Add-on · BI consultation services</h3><span class="bicost">Built on request · additional cost</span></header>
+      <p class="muted" style="margin:0 0 14px;max-width:72ch">Beyond the daily answers above, Carbon AI Labs can set up business intelligence for your studio: the numbers that show where money comes from, where it goes and what is coming next. Pick only the ones you need.</p>
+      <div class="bigrid">
+        <div class="bi"><div class="bih">Marketing KPIs</div><ul><li>Cost per enquiry and per booking</li><li>Enquiry-to-booking rate</li><li>Best channel: Instagram, referrals, ads, walk-ins</li></ul></div>
+        <div class="bi"><div class="bih">Investment tracking</div><ul><li>Money put into gear, ads and studio</li><li>Return on each investment</li><li>Payback period for new equipment</li></ul></div>
+        <div class="bi"><div class="bih">Revenue and profit</div><ul><li>Monthly revenue and profit</li><li>Profit per event after crew, travel and editing costs</li><li>Most and least profitable services</li></ul></div>
+        <div class="bi"><div class="bih">Sales forecast</div><ul><li>Expected bookings for the next 6 months</li><li>Wedding-season and muhurat-date demand</li><li>Revenue target vs. actual</li></ul></div>
+        <div class="bi"><div class="bih">Cash flow forecast</div><ul><li>Money coming in vs. going out, week by week</li><li>Early warning for tight months</li><li>Pending dues by age</li></ul></div>
+        <div class="bi"><div class="bih">Customer value</div><ul><li>Average booking value</li><li>Repeat and referral rate</li><li>Upsell rate: albums, reels, drone</li></ul></div>
+        <div class="bi"><div class="bih">Package performance</div><ul><li>Which packages sell best</li><li>Discounts given and their cost</li><li>Price changes and their effect</li></ul></div>
+        <div class="bi"><div class="bih">Team productivity</div><ul><li>Shoot days and edits per person</li><li>Editing turnaround time</li><li>Freelancer spend vs. in-house</li></ul></div>
+        <div class="bi"><div class="bih">Expense breakdown</div><ul><li>Spend by category each month</li><li>Cost per shoot day</li><li>Overheads as a share of revenue</li></ul></div>
+      </div></div>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2: CLIENTS ============ -->
+  <section class="page" id="p-clients" hidden>
+    <div class="intro"><div>
+      <h2>Clients</h2>
+      <p>Money, dates and deliveries for every client.</p>
+    </div></div>
+    <div class="kpis" id="cKpis"></div>
+    <div class="split" data-split="clients">
+      <nav class="sidenav" aria-label="Client sections"></nav>
+      <div class="panes">
+    <div class="card pane" data-sec="attention" data-label="Needs your attention" data-count="cTodo"><header><h3>Needs your attention</h3><span class="muted" style="font-size:.78rem">payments, deliveries and shoots in the next 7 days, plus anything overdue</span></header><div class="todo"><ul id="cTodo"></ul></div></div>
+    <div class="card pane" data-sec="map" data-label="Client map"><header><h3>Client map</h3><span class="muted" style="font-size:.78rem">where each client is on the road from booking to final delivery</span></header>
+      <div class="mapsum" id="mapSum"></div>
+      <div class="maplist" id="mapList"></div>
+      <div class="legend" style="margin-top:14px"><span><i style="background:var(--plum)"></i>Done</span><span><i style="background:#fff;box-shadow:0 0 0 3px rgba(56,189,248,.5)"></i>You are here</span><span><i style="background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line)"></i>Still ahead</span><span><i style="background:var(--bad-soft);box-shadow:inset 0 0 0 2px var(--bad)"></i>Running late</span></div></div>
+    <div class="card pane" data-sec="calendar" data-label="Event calendar"><header><h3>Event calendar</h3><div class="calnav"><button type="button" id="calPrev" aria-label="Previous month">‹</button><strong id="calLbl"></strong><button type="button" id="calNext" aria-label="Next month">›</button></div></header>
+        <div class="cal" id="cal"></div>
+        <div class="legend" id="calLegend"></div></div>
+    <div class="card pane" data-sec="upcoming" data-label="Coming up"><header><h3>Coming up</h3><span class="muted" style="font-size:.78rem">next 6 shoots</span></header><ul class="upc" id="upc"></ul></div>
+    <div class="card pane" data-sec="delivery" data-label="Delivery tracker"><header><h3>Delivery tracker</h3><span class="muted" style="font-size:.78rem">due date = last event date + ready-in days from the price list</span></header>
+      <div class="tbl"><table><thead><tr><th>Due</th><th>Client</th><th>Deliverable</th><th>Editor</th><th>Status</th></tr></thead><tbody id="dRows"></tbody></table></div></div>
+    <div class="card pane" data-sec="payments" data-label="Payments"><header><h3>Payments</h3><span class="muted" style="font-size:.78rem">30% to book · 80% by 7 days before the first event · rest on final delivery</span></header>
+        <div class="tbl"><table><thead><tr><th>Client</th><th class="n">Package</th><th class="n">Received</th><th>Paid</th><th class="n">Next amount</th><th>Due by</th></tr></thead><tbody id="payTbl"></tbody></table></div></div>
+    <div class="card pane" data-sec="earnings" data-label="What earns the money"><header><h3>What earns the money</h3><span class="muted" style="font-size:.78rem">booked value by service</span></header><div class="bars" id="mix"></div></div>
+    <div class="card pane" data-sec="directory" data-label="Client directory"><header><h3>Client directory</h3></header>
+      <div class="tbl"><table><thead><tr><th>Client</th><th>Contact</th><th>Events</th><th class="n">Package</th><th>Stage</th></tr></thead><tbody id="dirRows"></tbody></table></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 3: TEAM ============ -->
+  <section class="page" id="p-team" hidden>
+    <div class="intro"><div>
+      <h2>Team</h2>
+      <p>Who shoots where, who is free and what's left to edit.</p>
+    </div></div>
+    <div class="kpis" id="tKpis"></div>
+    <div class="split" data-split="team">
+      <nav class="sidenav" aria-label="Team sections"></nav>
+      <div class="panes">
+    <div class="card pane" id="clashCard" data-sec="crew" data-label="Needs crew" data-count="clashList"><header><h3>Needs crew</h3><span class="muted" style="font-size:.78rem">services with nobody assigned yet</span></header><div class="todo"><ul id="clashList"></ul></div></div>
+    <div class="card pane" data-sec="assign" data-label="Assign crew to shoots"><header><h3>Assign crew to shoots</h3><span class="muted" style="font-size:.78rem">pick a person for each service · greyed-out names are on leave or busy that day</span></header><div class="assign" id="assignList"></div></div>
+    <div class="card pane" data-sec="schedule" data-label="Who is where"><header><h3>Who is where · next 3 weeks</h3><span class="muted" style="font-size:.78rem">scroll sideways on a phone</span></header>
+      <div class="avail" id="avail"></div>
+      <div class="legend"><span><i class="t-wed"></i>Wedding</span><span><i class="t-rec"></i>Reception</span><span><i class="t-eng"></i>Engagement</span><span><i class="t-hal"></i>Haldi</span><span><i class="t-pre"></i>Pre-wedding</span><span><i class="t-oth"></i>Other</span><span><i style="background:#fff;box-shadow:inset 0 0 0 2px #FF3B30"></i>Clash</span><span><i style="border:1px dashed var(--plum)"></i>Edit due</span></div></div>
+    <div class="card pane" data-sec="leave" data-label="Leave calendar"><header><h3>Leave calendar</h3><div class="calnav"><button type="button" id="lvPrev" aria-label="Previous month">‹</button><strong id="lvLbl"></strong><button type="button" id="lvNext" aria-label="Next month">›</button></div></header>
+      <form class="add payform lvform" id="lvForm">
+        <label for="lvWho">Team member<select id="lvWho" required></select></label>
+        <label for="lvFrom">From<input id="lvFrom" type="date" required></label>
+        <label for="lvTo">To (optional)<input id="lvTo" type="date"></label>
+        <div class="payact"><button class="btn" type="submit">Add leave</button><span class="muted" style="font-size:.78rem">Anyone on leave is greyed out in the crew dropdowns for those days.</span></div>
+      </form>
+      <div class="cal lvcal" id="lvCal" style="margin-top:16px"></div>
+      <div class="legend"><span><i style="background:var(--silver)"></i>On leave</span><span><i style="background:#fff;box-shadow:inset 0 0 0 2px #FF3B30"></i>On leave but picked for a shoot</span><span><i style="background:var(--warn)"></i>3 or more off</span></div>
+      <h4 class="lvh">Upcoming leave</h4><ul class="lvlist" id="lvList"></ul></div>
+    <div class="card pane" data-sec="members" data-label="Team members"><header><h3>Team members</h3></header><div class="team" id="teamCards"></div></div>
+    <div class="card pane" data-sec="queue" data-label="Editing queue"><header><h3>Editing queue</h3><span class="muted" style="font-size:.78rem">open edits, earliest due first</span></header>
+      <div class="tbl"><table><thead><tr><th>Due</th><th>Editor</th><th>Job</th><th>Client</th><th>Status</th></tr></thead><tbody id="qRows"></tbody></table></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site"><div class="wrap"><span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M52.8 20 L32 8 L11.2 20 L11.2 44 L32 56 L52.8 44" fill="none" stroke="#F3EEEE" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="52.8" cy="32" r="5.5" fill="#38BDF8"/></svg><b>Carbon AI Desk</b> by Carbon AI Labs · carbonailabs.in</span><span>Sample dashboard · names and figures are made up</span></div></footer>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- date helpers (whole days, UTC) ---------- */
+const D=s=>{const[y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)/864e5};
+const S=n=>new Date(n*864e5).toISOString().slice(0,10);
+const fd=(n,o={day:'numeric',month:'short'})=>new Date(n*864e5).toLocaleDateString('en-IN',{...o,timeZone:'UTC'});
+const TODAY=D('2026-11-24');
+const inr=v=>'₹'+Math.round(v).toLocaleString('en-IN');
+const rel=n=>{const d=n-TODAY;if(d===0)return'today';if(d===1)return'tomorrow';if(d===-1)return'yesterday';return d>0?`in ${d} days`:`${-d} days ago`};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=id=>document.getElementById(id);
+
+/* ---------- INPUT A: price list ---------- */
+const SVC={
+  cp:{n:'Candid photo',k:'shoot',p:35000,u:'per event'},
+  cv:{n:'Candid video',k:'shoot',p:45000,u:'per event'},
+  tp:{n:'Traditional photo',k:'shoot',p:20000,u:'per event'},
+  tv:{n:'Traditional video',k:'shoot',p:25000,u:'per event'},
+  dr:{n:'Drone',k:'shoot',p:15000,u:'per event'},
+  mx:{n:'Mixer (live switching)',k:'shoot',p:12000,u:'per event'},
+  cve:{n:'Candid video editing',k:'post',p:30000,u:'per project',days:45},
+  tve:{n:'Traditional video editing',k:'post',p:20000,u:'per project',days:40},
+  reel:{n:'Reels edit',k:'post',p:3500,u:'per reel',days:7},
+  nve:{n:'Normal video editing',k:'post',p:10000,u:'per project',days:21},
+  cgv:{n:'Color grading (video)',k:'post',p:12000,u:'per project',days:30},
+  cgp:{n:'Color grading (photo)',k:'post',p:8000,u:'per project',days:20},
+  gd:{n:'Graphic design',k:'post',p:5000,u:'per project',days:10},
+  alb:{n:'Album design layout',k:'post',p:18000,u:'per album',days:60},
+  cov:{n:'Album cover design',k:'post',p:4000,u:'per album',days:60},
+};
+const TYPE={Wedding:'wed',Reception:'rec',Engagement:'eng',Haldi:'hal','Pre-wedding shoot':'pre',Birthday:'oth','Naming ceremony':'oth'};
+
+/* ---------- INPUT B: team ---------- */
+const TEAM=[
+  {id:'E1',n:'Ravi Kumar',r:'Lead Candid Photographer',ph:'+91 98450 11223',sk:['cp'],leave:[]},
+  {id:'E2',n:'Priya Nair',r:'Candid Photographer',ph:'+91 98451 22334',sk:['cp'],leave:['2026-11-28']},
+  {id:'E3',n:'Suresh Babu',r:'Traditional Photographer',ph:'+91 98452 33445',sk:['tp'],leave:[]},
+  {id:'E4',n:'Arjun Reddy',r:'Cinematographer',ph:'+91 98453 44556',sk:['cv'],leave:['2026-12-14']},
+  {id:'E5',n:'Karthik S',r:'Traditional Videographer',ph:'+91 98454 55667',sk:['tv'],leave:[]},
+  {id:'E6',n:'Manoj Das',r:'Drone Pilot',ph:'+91 98455 66778',sk:['dr'],leave:[]},
+  {id:'E7',n:'Imran Khan',r:'Live Mixer Technician',ph:'+91 98456 77889',sk:['mx'],leave:[]},
+  {id:'E8',n:'Divya Menon',r:'Senior Video Editor',ph:'+91 98457 88990',sk:['cve','tve','nve','cgv'],leave:[]},
+  {id:'E9',n:'Naveen Joseph',r:'Reels & Video Editor',ph:'+91 98458 99001',sk:['reel','nve','cgv'],leave:[]},
+  {id:'E10',n:'Sneha Iyer',r:'Photo Editor & Album Designer',ph:'+91 98459 00112',sk:['cgp','gd','alb','cov'],leave:[]},
+];
+
+/* ---------- INPUT C + D: clients, events, payments ---------- */
+const CLIENTS=[
+ {id:'C1',n:'Ananya & Rohit Sharma',ph:'+91 98860 45120',em:'ananya.rohit@example.com',
+  ev:[{t:'Wedding',d:'2026-10-18',v:'Taj West End, Bengaluru',s:['cp','cv','tp','tv','dr']},
+      {t:'Reception',d:'2026-10-19',v:'Taj West End, Bengaluru',s:['cp','cv','mx']}],
+  post:{cve:1,tve:1,reel:4,cgp:1,alb:1,cov:1},done:['reel','cgp'],
+  pay:[['2026-06-02',110000],['2026-10-10',182000]]},
+ {id:'C8',n:'Gowda Family',ph:'+91 98804 33190',em:'r.gowda@example.com',
+  ev:[{t:'Birthday',d:'2026-10-05',v:'Gowda residence, Jayanagar',s:['tp','tv']}],
+  post:{tve:1,alb:1},done:[],pay:[['2026-09-01',25000]]},
+ {id:'C2',n:'Meera & Karthik Iyer',ph:'+91 94440 21873',em:'meera.k@example.com',
+  ev:[{t:'Wedding',d:'2026-11-28',v:'Sri Krishna Kalyana Mantapam, Chennai',s:['cp','cv','tp','tv','dr','mx']},
+      {t:'Reception',d:'2026-11-29',v:'ITC Grand Chola, Chennai',s:['cp','cv','mx']}],
+  post:{cve:1,tve:1,reel:6,cgp:1,cgv:1,alb:1,cov:1},done:[],pay:[['2026-07-14',120000]]},
+ {id:'C3',n:'Sana & Faisal Ahmed',ph:'+91 99000 63411',em:'sana.faisal@example.com',
+  ev:[{t:'Engagement',d:'2026-11-27',v:'The Leela Palace, Bengaluru',s:['cp','tp']},
+      {t:'Wedding',d:'2026-12-12',v:'Shadi Mahal, Frazer Town',s:['cp','cv','dr']}],
+  post:{cve:1,reel:3,cgp:1,alb:1,cov:1},done:[],pay:[['2026-08-20',60000],['2026-11-15',120000]]},
+ {id:'C9',n:'Gupta Family',ph:'+91 99161 20784',em:'gupta.home@example.com',
+  ev:[{t:'Naming ceremony',d:'2026-11-28',v:'Gupta residence, Indiranagar',s:['cp']}],
+  post:{cgp:1,gd:1},done:[],pay:[['2026-11-12',40000]]},
+ {id:'C4',n:'Divya & Aditya Rao',ph:'+91 98451 77290',em:'divya.aditya@example.com',
+  ev:[{t:'Haldi',d:'2026-12-05',v:'Family home, Mysuru',s:['cp','cv']},
+      {t:'Wedding',d:'2026-12-06',v:'Lalitha Mahal Palace, Mysuru',s:['cp','cv','tp','tv','dr','mx']},
+      {t:'Reception',d:'2026-12-07',v:'Lalitha Mahal Palace, Mysuru',s:['cp','tp','mx']}],
+  post:{cve:1,tve:1,reel:8,cgp:1,cgv:1,alb:1,cov:1,gd:1},done:[],pay:[['2026-09-05',150000]]},
+ {id:'C5',n:'Lakshmi & Venkatesh',ph:'+91 97400 88214',em:'lakshmi.v@example.com',
+  ev:[{t:'Wedding',d:'2026-12-12',v:'Sri Venkateshwara Kalyana Mandapam, Hosur',s:['tp','tv','dr','mx']}],
+  post:{tve:1,nve:1,alb:1,cov:1},done:[],pay:[['2026-09-28',40000]]},
+ {id:'C6',n:'Nisha & Rahul Menon',ph:'+91 95388 10427',em:'nisha.rahul@example.com',
+  ev:[{t:'Pre-wedding shoot',d:'2026-12-20',v:'Nandi Hills',s:['cp','cv','dr']},
+      {t:'Wedding',d:'2027-01-24',v:'Bolgatty Palace, Kochi',s:['cp','cv','tp','tv','dr','mx']}],
+  post:{cve:1,reel:5,cgp:1,cgv:1,alb:1,cov:1,gd:1},done:[],pay:[['2026-10-30',100000]]},
+ {id:'C7',n:'Kavya & Sameer Khan',ph:'+91 90080 55612',em:'kavya.sameer@example.com',
+  ev:[{t:'Reception',d:'2027-01-10',v:'Bangalore Palace Grounds',s:['cp','cv','mx']}],
+  post:{cve:1,reel:4,cgp:1},done:[],pay:[['2026-11-10',50000]]},
+];
+let NEW_ID=null;
+
+/* ---------- RULES (the "intelligence") ---------- */
+const eventValue=e=>e.s.reduce((a,k)=>a+SVC[k].p,0);
+const postValue=post=>Object.entries(post).reduce((a,[k,q])=>a+SVC[k].p*q,0);
+const short=n=>n.split(' & ')[0].replace(' Family',' fam.');
+let M; // computed model
+// Sample data only: fill in crew choices the studio "already made", leaving a gap where nobody was free.
+function seedSampleCrew(){
+  const busyS={},cnt={};TEAM.forEach(t=>cnt[t.id]=0);
+  const all=[];CLIENTS.forEach(c=>c.ev.forEach(e=>all.push(e)));
+  all.sort((a,b)=>D(a.d)-D(b.d)).forEach(e=>{
+    e.crew=e.crew||{};const day=D(e.d);
+    e.s.forEach(k=>{
+      const pick=TEAM.filter(t=>t.sk.includes(k)&&!t.leave.some(l=>D(l)===day)&&!busyS[t.id+'|'+day]).sort((a,b)=>cnt[a.id]-cnt[b.id])[0];
+      if(pick){e.crew[k]=pick.id;busyS[pick.id+'|'+day]=1;cnt[pick.id]++}
+    });
+  });
+}
+function crewChoices(day,k,selfId){
+  return TEAM.filter(t=>t.sk.includes(k)).map(t=>{
+    const other=(M.busy[t.id+'|'+day]||[]).filter(x=>x.id!==selfId);
+    const why=M.onLeave(t,day)?'on leave':other.length?`at ${other[0].t}, ${short(other[0].c.n)}`:'';
+    return {t,why};
+  });
+}
+function crewSelect(day,k,cur,attrs,selfId){
+  const ch=crewChoices(day,k,selfId);
+  const free=ch.filter(x=>!x.why),notFree=ch.filter(x=>x.why);
+  const curBad=cur&&notFree.some(x=>x.t.id===cur);
+  let o=`<option value="">${free.length?'Choose…':'Nobody free'}</option>`;
+  o+=free.map(x=>`<option value="${x.t.id}" ${x.t.id===cur?'selected':''}>${x.t.n} · free</option>`).join('');
+  if(notFree.length)o+=`<optgroup label="Not available">`+notFree.map(x=>`<option value="${x.t.id}" ${x.t.id===cur?'selected':'disabled'}>${x.t.n} · ${esc(x.why)}</option>`).join('')+`</optgroup>`;
+  return `<select ${attrs} class="${!cur?'empty':curBad?'bad':''}">${o}</select>`;
+}
+
+function compute(){
+  const events=[],deliv=[],busy={},clients=[];
+  const shootCount={};TEAM.forEach(t=>shootCount[t.id]=0);
+  CLIENTS.forEach(c=>{
+    const evs=c.ev.map((e,i)=>({...e,src:e,id:c.id+'-'+i,c,day:D(e.d),val:eventValue(e)})).sort((a,b)=>a.day-b.day);
+    const total=evs.reduce((a,e)=>a+e.val,0)+postValue(c.post);
+    const paid=c.pay.reduce((a,p)=>a+p[1],0);
+    const first=evs[0].day,last=evs[evs.length-1].day;
+    const dl=Object.entries(c.post).map(([k,q])=>({k,q,c,due:last+SVC[k].days,done:c.done.includes(k),val:SVC[k].p*q}));
+    const finalDue=Math.max(...dl.map(x=>x.due),last);
+    // payment rule
+    let nextAmt=0,nextDue=null;
+    if(paid<total*0.8-1){nextAmt=total*0.8-paid;nextDue=first-7}
+    else if(paid<total-1){nextAmt=total-paid;nextDue=finalDue}
+    const allDone=dl.every(x=>x.done);
+    const stage= TODAY<first?'Booked':TODAY<=last?'Shooting':allDone?'Completed':'Editing';
+    clients.push({c,evs,total,paid,first,last,nextAmt,nextDue,stage,dl});
+    events.push(...evs);deliv.push(...dl);
+  });
+  events.sort((a,b)=>a.day-b.day);
+  // crew: read the person chosen for each service (input), nothing automatic
+  const assign={},unstaffed=[];
+  const onLeave=(t,day)=>t.leave.some(l=>D(l)===day);
+  events.forEach(e=>{
+    assign[e.id]=[];const crew=e.src.crew||{};
+    e.s.forEach(k=>{
+      const emp=crew[k];
+      if(!emp){unstaffed.push({e,k});return}
+      const a=assign[e.id].find(x=>x.emp===emp);
+      if(a){a.svc.push(k);return}
+      assign[e.id].push({emp,svc:[k]});
+      const key=emp+'|'+e.day;(busy[key]=busy[key]||[]).push(e);shootCount[emp]++;
+    });
+  });
+  // clashes
+  const clashes=[];
+  Object.entries(busy).forEach(([k,evs])=>{
+    const [emp,day]=k.split('|');const t=TEAM.find(x=>x.id===emp);const dn=+day;
+    if(evs.length>1||onLeave(t,dn))clashes.push({t,day:dn,evs,leave:onLeave(t,dn)});
+  });
+  clashes.sort((a,b)=>a.day-b.day);
+  // editor assignment (balance open jobs)
+  const open={};TEAM.forEach(t=>open[t.id]=0);
+  deliv.sort((a,b)=>a.due-b.due).forEach(x=>{
+    const cand=TEAM.filter(t=>t.sk.includes(x.k)).sort((a,b)=>open[a.id]-open[b.id]);
+    x.ed=cand[0];if(!x.done)open[x.ed.id]++;
+  });
+  deliv.forEach(x=>{x.status=x.done?'done':x.due<TODAY?'over':x.due-TODAY<=7?'soon':TODAY<x.c.ev.map(e=>D(e.d)).sort((a,b)=>b-a)[0]?'wait':'track'});
+  M={events,deliv,busy,clients,assign,clashes,open,shootCount,onLeave,unstaffed};
+}
+
+/* ---------- PAGE 1 render ---------- */
+function renderData(){
+  $('rulesList').innerHTML=[
+    ['Price','add up the price of each service booked'],
+    ['Due date','last event + ready-in days (reels 7, edits 40–45, album 60)'],
+    ['Payment','80% due 7 days before the first event, rest on delivery'],
+    ['Crew','you pick from people with the right skill who are free that day'],
+    ['Alert','anything overdue, or due in the next 7 days'],
+  ].map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('');
+  $('priceRows').innerHTML=Object.values(SVC).map(s=>`<tr><td>${s.n}</td><td><span class="pill ${s.k==='shoot'?'p-info':'p-mute'}">${s.k==='shoot'?'Event day':'Editing'}</span></td><td class="muted">${s.u}</td><td class="n">${s.p.toLocaleString('en-IN')}</td><td class="n muted">${s.days?s.days+' days':'—'}</td></tr>`).join('');
+  $('teamRows').innerHTML=TEAM.map(t=>`<tr><td><b>${t.n}</b></td><td>${t.r}</td><td class="mono" style="white-space:nowrap">${t.ph}</td><td class="muted">${t.leave.map(l=>fd(D(l))).join(', ')||'—'}</td></tr>`).join('');
+  $('bookRows').innerHTML=M.events.map(e=>`<tr class="${e.c.id===NEW_ID?'new':''}"><td><b>${esc(e.c.n)}</b></td><td class="mono" style="white-space:nowrap">${esc(e.c.ph)}</td><td>${e.t}</td><td class="mono" style="white-space:nowrap">${fd(e.day,{day:'2-digit',month:'short',year:'numeric'})}</td><td>${esc(e.v)}</td><td>${e.s.map(k=>SVC[k].n).join(', ')}</td></tr>`).join('');
+  const pays=[];CLIENTS.forEach(c=>c.pay.forEach((p,i)=>pays.push({d:D(p[0]),a:p[1],mode:p[2]||['UPI','Bank transfer','UPI','Cheque'][(c.n.length+i)%4],note:p[3]||(i===0?'Booking advance':'Instalment '+(i+1)),fresh:p[4],c})));
+  $('payRows').innerHTML=pays.sort((a,b)=>b.d-a.d).map(p=>`<tr class="${p.fresh?'new':''}"><td class="mono">${fd(p.d,{day:'2-digit',month:'short',year:'numeric'})}</td><td>${esc(p.c.n)}</td><td>${esc(p.mode||'—')}</td><td class="muted">${esc(p.note||'')}</td><td class="n">${p.a.toLocaleString('en-IN')}</td></tr>`).join('');
+  const keep=$('pClient').value;
+  $('pClient').innerHTML='<option value="">Choose client…</option>'+CLIENTS.map(c=>`<option value="${c.id}">${esc(c.n)}</option>`).join('');
+  $('pClient').value=keep;payHint();
+}
+
+/* ---------- PAGE 2 render ---------- */
+let calY=2026,calM=10; // November (0-based)
+function renderClients(){
+  const C=M.clients;
+  const total=C.reduce((a,x)=>a+x.total,0),paid=C.reduce((a,x)=>a+x.paid,0);
+  const overduePay=C.filter(x=>x.nextAmt>0&&x.nextDue<TODAY);
+  const next30=M.events.filter(e=>e.day>=TODAY&&e.day<TODAY+30);
+  const lateDl=M.deliv.filter(x=>x.status==='over');
+  $('cKpis').innerHTML=[
+    {l:'Total booked',v:inr(total),s:`${C.length} clients · ${M.events.length} events`},
+    {l:'Money received',v:inr(paid),s:`${Math.round(paid/total*100)}% of booked value`,cls:'ok'},
+    {l:'Still to collect',v:inr(total-paid),s:`${inr(overduePay.reduce((a,x)=>a+x.nextAmt,0))} is overdue`,cls:overduePay.length?'alert':''},
+    {l:'Shoots next 30 days',v:next30.length,s:`${new Set(next30.map(e=>e.day)).size} working days`},
+    {l:'Late deliveries',v:lateDl.length,s:lateDl.length?'past promised date':'all on time',cls:lateDl.length?'alert':'ok'},
+  ].map(k=>`<div class="kpi ${k.cls||''}"><div class="eyebrow">${k.l}</div><div class="v">${k.v}</div><div class="s">${k.s}</div></div>`).join('');
+
+  // to-do
+  const todo=[];
+  C.forEach(x=>{if(x.nextAmt>0&&x.nextDue<=TODAY+7){const o=x.nextDue<TODAY;todo.push({d:x.nextDue,cls:o?'p-bad':'p-warn',tag:o?'Payment overdue':'Payment due',txt:`Collect <b>${inr(x.nextAmt)}</b> from ${esc(x.c.n)} · ${esc(x.c.ph)}`})}});
+  M.deliv.filter(x=>x.status==='over'||x.status==='soon').forEach(x=>todo.push({d:x.due,cls:x.status==='over'?'p-bad':'p-warn',tag:x.status==='over'?'Delivery late':'Delivery due',txt:`${SVC[x.k].n}${x.q>1?' ×'+x.q:''} for ${esc(x.c.n)} · ${x.ed.n}`}));
+  M.events.filter(e=>e.day>=TODAY&&e.day<=TODAY+7).forEach(e=>{
+    const crew=M.assign[e.id].map(a=>TEAM.find(t=>t.id===a.emp).n.split(' ')[0]);
+    const miss=M.unstaffed.filter(u=>u.e===e).map(u=>SVC[u.k].n.toLowerCase());
+    todo.push({d:e.day,cls:miss.length?'p-bad':'p-info',tag:miss.length?'Shoot · crew missing':'Shoot',txt:`${e.t} · ${esc(e.c.n)} at ${esc(e.v)} · crew: ${crew.join(', ')||'none yet'}${miss.length?` · <b>no one for ${miss.join(', ')}</b>`:''}`});
+  });
+  todo.sort((a,b)=>a.d-b.d);
+  $('cTodo').innerHTML=todo.map(t=>`<li><span class="pill ${t.cls}">${t.tag}</span><span>${t.txt}</span><span class="when">${fd(t.d)} · ${rel(t.d)}</span></li>`).join('')||'<li><span class="pill p-good">All clear</span><span>Nothing due this week.</span><span></span></li>';
+
+  renderCal();
+
+  // upcoming
+  $('upc').innerHTML=M.events.filter(e=>e.day>=TODAY).slice(0,6).map(e=>`<li><div class="datebox"><b>${fd(e.day,{day:'numeric'})}</b><span>${fd(e.day,{month:'short'})}</span></div><div><div class="t"><span class="pill t-${TYPE[e.t]||'oth'}" style="margin-right:6px">${e.t}</span>${esc(e.c.n)}</div><div class="sub">${esc(e.v)}</div><div class="sub">${e.s.map(k=>SVC[k].n).join(' · ')}</div><div class="count muted">${rel(e.day)} · ${inr(e.val)}</div></div></li>`).join('');
+
+  // deliveries
+  const order={over:0,soon:1,track:2,wait:3,done:4};
+  const lbl={over:['p-bad','Late'],soon:['p-warn','Due this week'],track:['p-good','On track'],wait:['p-mute','After event'],done:['p-good','Delivered ✓']};
+  $('dRows').innerHTML=[...M.deliv].sort((a,b)=>order[a.status]-order[b.status]||a.due-b.due).filter(x=>x.due>=TODAY-60).slice(0,16).map(x=>`<tr><td class="mono" style="white-space:nowrap">${fd(x.due)}<div class="muted" style="font-size:.72rem">${x.done?'':rel(x.due)}</div></td><td>${esc(x.c.n)}</td><td>${SVC[x.k].n}${x.q>1?' × '+x.q:''}</td><td>${x.ed.n}</td><td><span class="pill ${lbl[x.status][0]}">${lbl[x.status][1]}</span></td></tr>`).join('');
+
+  // payments
+  $('payTbl').innerHTML=[...C].sort((a,b)=>(a.nextDue??9e9)-(b.nextDue??9e9)).map(x=>{
+    const pct=Math.min(100,x.paid/x.total*100);
+    let due='<span class="pill p-good">Fully paid</span>';
+    if(x.nextAmt>0){const o=x.nextDue<TODAY,s=!o&&x.nextDue<=TODAY+7;due=`<span class="mono">${fd(x.nextDue)}</span> <span class="pill ${o?'p-bad':s?'p-warn':'p-mute'}">${o?'Overdue':s?'This week':rel(x.nextDue)}</span>`}
+    return `<tr><td>${esc(x.c.n)}</td><td class="n">${x.total.toLocaleString('en-IN')}</td><td class="n">${x.paid.toLocaleString('en-IN')}</td><td><div class="prog" title="${Math.round(pct)}%"><i style="width:${pct}%"></i></div></td><td class="n">${x.nextAmt?x.nextAmt.toLocaleString('en-IN'):'—'}</td><td style="white-space:nowrap">${due}</td></tr>`}).join('');
+
+  // service mix
+  const mix={};
+  M.events.forEach(e=>{e.s.forEach(k=>{mix[k]=(mix[k]||0)+SVC[k].p})});
+  M.clients.forEach(x=>Object.entries(x.c.post).forEach(([k,q])=>mix[k]=(mix[k]||0)+SVC[k].p*q));
+  const ent=Object.entries(mix).sort((a,b)=>b[1]-a[1]);const mx=ent[0][1];
+  $('mix').innerHTML=ent.map(([k,v])=>`<div class="bar"><span>${SVC[k].n}</span><div class="track"><i style="width:${v/mx*100}%;background:${SVC[k].k==='shoot'?'var(--plum)':'var(--silver)'}"></i></div><span class="v">${inr(v)}</span></div>`).join('')
+   +`<div class="legend"><span><i style="background:var(--plum)"></i>Event day</span><span><i style="background:var(--silver)"></i>Editing & design</span></div>`;
+
+  // directory
+  const stc={Booked:'p-info',Shooting:'p-warn',Editing:'p-mute',Completed:'p-good'};
+  $('dirRows').innerHTML=C.map(x=>`<tr class="${x.c.id===NEW_ID?'new':''}"><td><b>${esc(x.c.n)}</b></td><td><div class="mono" style="white-space:nowrap">${esc(x.c.ph)}</div><div class="muted" style="font-size:.78rem">${esc(x.c.em||'')}</div></td><td>${x.evs.map(e=>`<div style="white-space:nowrap"><span class="pill t-${TYPE[e.t]||'oth'}">${e.t}</span> <span class="mono muted">${fd(e.day)}</span></div>`).join('')}</td><td class="n">${inr(x.total)}</td><td><span class="pill ${stc[x.stage]}">${x.stage}</span></td></tr>`).join('');
+}
+
+function renderCal(){
+  const first=Date.UTC(calY,calM,1)/864e5;
+  const dim=new Date(Date.UTC(calY,calM+1,0)).getUTCDate();
+  const lead=(new Date(first*864e5).getUTCDay()+6)%7;
+  $('calLbl').textContent=new Date(first*864e5).toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'UTC'});
+  let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('');
+  const cells=Math.ceil((lead+dim)/7)*7;
+  for(let i=0;i<cells;i++){
+    const day=first-lead+i,inM=i>=lead&&i<lead+dim;
+    const evs=M.events.filter(e=>e.day===day);
+    const dls=M.deliv.filter(x=>x.due===day&&!x.done);
+    h+=`<div class="day ${inM?'':'out'} ${day===TODAY?'today':''}"><span class="dn">${new Date(day*864e5).getUTCDate()}</span>${evs.map(e=>`<span class="chip t-${TYPE[e.t]||'oth'}" title="${e.t}: ${esc(e.c.n)} · ${esc(e.v)}">${e.t.split(' ')[0]} · ${esc(short(e.c.n))}</span>`).join('')}${dls.slice(0,2).map(x=>`<span class="chip dl ${x.due<TODAY?'over':''}" title="Due: ${SVC[x.k].n} for ${esc(x.c.n)}">Due · ${SVC[x.k].n.split(' ')[0]}</span>`).join('')}${dls.length>2?`<span class="dn">+${dls.length-2} due</span>`:''}</div>`;
+  }
+  $('cal').innerHTML=h;
+  $('calLegend').innerHTML=Object.entries({wed:'Wedding',rec:'Reception',eng:'Engagement',hal:'Haldi',pre:'Pre-wedding',oth:'Other'}).map(([k,v])=>`<span><i class="t-${k}"></i>${v}</span>`).join('')+'<span><i style="border:1px dashed var(--ink)"></i>Delivery due</span>';
+}
+
+/* ---------- PAGE 3 render ---------- */
+function renderTeam(){
+  const days=[...Array(21)].map((_,i)=>TODAY+i);
+  const upcomingClash=M.clashes.filter(k=>k.day>=TODAY);const gaps=M.unstaffed.filter(u=>u.e.day>=TODAY);
+  const assignNext30=Object.entries(M.busy).filter(([k])=>{const d=+k.split('|')[1];return d>=TODAY&&d<TODAY+30}).reduce((a,[,v])=>a+v.length,0);
+  const openJobs=M.deliv.filter(x=>!x.done).length;
+  const busiest=[...TEAM].filter(t=>!t.sk.some(k=>SVC[k].k==='post')).map(t=>({t,n:Object.entries(M.busy).filter(([k])=>k.startsWith(t.id+'|')&&+k.split('|')[1]>=TODAY&&+k.split('|')[1]<TODAY+30).length})).sort((a,b)=>b.n-a.n)[0];
+  $('tKpis').innerHTML=[
+    {l:'Team members',v:TEAM.length,s:`${TEAM.filter(t=>t.sk.some(k=>SVC[k].k==='shoot')).length} on shoots · ${TEAM.filter(t=>t.sk.some(k=>SVC[k].k==='post')).length} editors`},
+    {l:'Shoot duties, 30 days',v:assignNext30,s:'one person at one event'},
+    {l:'Services without crew',v:gaps.length,s:gaps.length?'pick someone or book a freelancer':'every shoot is covered',cls:gaps.length?'alert':'ok'},
+    {l:'Open editing jobs',v:openJobs,s:`${M.deliv.filter(x=>x.status==='over').length} already late`},
+    {l:'Busiest on shoots',v:busiest.t.n.split(' ')[0],s:`${busiest.n} shoot days in next 30`},
+  ].map(k=>`<div class="kpi ${k.cls||''}"><div class="eyebrow">${k.l}</div><div class="v">${k.v}</div><div class="s">${k.s}</div></div>`).join('');
+
+  $('clashCard').hidden=!gaps.length&&!upcomingClash.length;
+  $('clashList').innerHTML=gaps.map(u=>{
+    const ch=crewChoices(u.e.day,u.k,u.e.id),free=ch.filter(x=>!x.why);
+    const tip=free.length?`Free: ${free.map(x=>x.t.n.split(' ')[0]).join(', ')}. Pick one below.`:`${ch.map(x=>x.t.n.split(' ')[0]+' is '+x.why).join('; ')}. Book a freelancer.`;
+    return `<li><span class="pill p-bad">Needs crew</span><span><b>${SVC[u.k].n}</b> for ${u.e.t} · ${esc(u.e.c.n)}. <span class="muted">${esc(tip)}</span></span><span class="when">${fd(u.e.day)} · ${rel(u.e.day)}</span></li>`}).join('')
+   +upcomingClash.map(k=>`<li><span class="pill p-bad">Clash</span><span><b>${k.t.n}</b> ${k.leave?'is on leave but is picked for':'is picked for '+k.evs.length+' shoots:'} ${k.evs.map(e=>`${e.t} · ${esc(e.c.n)}`).join(' and ')}.</span><span class="when">${fd(k.day)} · ${rel(k.day)}</span></li>`).join('');
+  // crew pickers
+  $('assignList').innerHTML=M.events.filter(e=>e.day>=TODAY).map(e=>{
+    const miss=M.unstaffed.filter(u=>u.e===e).length;
+    return `<div class="ashoot"><div class="hd2"><span class="pill t-${TYPE[e.t]||'oth'}">${e.t}</span><b>${esc(e.c.n)}</b><span class="when">${fd(e.day,{weekday:'short',day:'numeric',month:'short'})} · ${rel(e.day)}</span><span class="muted" style="font-size:.8rem">${esc(e.v)}</span><span class="st pill ${miss?'p-warn':'p-good'}">${miss?miss+' to assign':'Crew complete'}</span></div>
+      <div class="slots">${e.s.map(k=>`<label>${SVC[k].n}${crewSelect(e.day,k,(e.src.crew||{})[k]||'',`data-ev="${e.id}" data-k="${k}" aria-label="${SVC[k].n} for ${esc(e.c.n)}"`,e.id)}</label>`).join('')}</div></div>`}).join('');
+
+  // availability grid
+  let h='<table><thead><tr><th class="who">Team member</th>'+days.map(d=>{const dt=new Date(d*864e5);const wk=dt.getUTCDay()%6===0;return `<th class="${d===TODAY?'tod':''} ${wk?'wk':''}">${dt.toLocaleDateString('en-IN',{weekday:'narrow',timeZone:'UTC'})}<br>${dt.getUTCDate()}</th>`}).join('')+'</tr></thead><tbody>';
+  TEAM.forEach(t=>{
+    h+=`<tr><td class="who"><b>${t.n}</b><span>${t.r}</span></td>`;
+    days.forEach(d=>{
+      const evs=M.busy[t.id+'|'+d]||[],lv=M.onLeave(t,d);
+      const dues=M.deliv.filter(x=>x.ed.id===t.id&&!x.done&&x.due===d);
+      let c='';
+      if(evs.length>1||(lv&&evs.length))c=`<div class="slot clash" title="${evs.map(e=>e.t+': '+esc(e.c.n)).join(' / ')}${lv?' (on leave)':''}">${lv&&evs.length===1?'Leave!':evs.length+' jobs'}</div>`;
+      else if(evs.length)c=`<div class="slot t-${TYPE[evs[0].t]||'oth'}" title="${evs[0].t}: ${esc(evs[0].c.n)} · ${esc(evs[0].v)}">${esc(short(evs[0].c.n))}</div>`;
+      else if(lv)c='<div class="slot leave">Leave</div>';
+      else if(dues.length)c=`<div class="slot due" title="${dues.map(x=>SVC[x.k].n+' · '+esc(x.c.n)).join(' / ')}">Due ${dues.length}</div>`;
+      h+=`<td>${c}</td>`;
+    });
+    h+='</tr>';
+  });
+  $('avail').innerHTML=h+'</tbody></table>';
+
+  // team cards
+  const maxOpen=Math.max(...Object.values(M.open),1);
+  $('teamCards').innerHTML=TEAM.map(t=>{
+    const isEd=t.sk.some(k=>SVC[k].k==='post');
+    const mine=Object.entries(M.busy).filter(([k])=>k.startsWith(t.id+'|')).flatMap(([k,v])=>v.map(e=>({e,d:+k.split('|')[1]}))).filter(x=>x.d>=TODAY).sort((a,b)=>a.d-b.d);
+    const myDl=M.deliv.filter(x=>x.ed.id===t.id&&!x.done).sort((a,b)=>a.due-b.due);
+    const initials=t.n.split(' ').map(w=>w[0]).join('').slice(0,2);
+    let body,load,ll;
+    if(isEd){
+      const late=myDl.filter(x=>x.due<TODAY).length;
+      load=myDl.length/maxOpen;ll=`${myDl.length} open jobs${late?` · <span style="color:var(--bad)">${late} late</span>`:''}`;
+      body=myDl[0]?`<div class="row"><span class="muted">Next due</span><span>${SVC[myDl[0].k].n} · ${esc(short(myDl[0].c.n))}</span></div><div class="row"><span class="muted">Due date</span><span class="mono">${fd(myDl[0].due)} (${rel(myDl[0].due)})</span></div>`:'<div class="row muted">No open jobs</div>';
+    }else{
+      const n30=mine.filter(x=>x.d<TODAY+30).length;
+      load=n30/12;ll=`${n30} shoot days in next 30`;
+      body=mine[0]?`<div class="row"><span class="muted">Next shoot</span><span>${mine[0].e.t} · ${esc(short(mine[0].e.c.n))}</span></div><div class="row"><span class="muted">When</span><span class="mono">${fd(mine[0].d)} (${rel(mine[0].d)})</span></div>`:'<div class="row muted">No shoots booked</div>';
+    }
+    const col=load>.75?'var(--bad)':load>.45?'var(--warn)':'var(--good)';
+    return `<div class="member"><div class="top"><div class="avatar">${initials}</div><div><b>${t.n}</b><div class="role">${t.r}</div></div></div>
+      <div class="row"><span class="muted">Phone</span><span class="mono">${t.ph}</span></div>${body}
+      <div><div class="row" style="margin-bottom:4px"><span class="muted">Workload</span><span>${ll}</span></div><div class="load"><i style="width:${Math.min(100,load*100)}%;background:${col}"></i></div></div>
+      ${t.leave.length?`<div class="row"><span class="muted">Leave</span><span>${t.leave.map(l=>fd(D(l))).join(', ')}</span></div>`:''}</div>`}).join('');
+
+  // editing queue
+  const lbl={over:['p-bad','Late'],soon:['p-warn','Due this week'],track:['p-good','On track'],wait:['p-mute','Event not done']};
+  $('qRows').innerHTML=M.deliv.filter(x=>!x.done).sort((a,b)=>a.due-b.due).slice(0,18).map(x=>`<tr><td class="mono" style="white-space:nowrap">${fd(x.due)}<div class="muted" style="font-size:.72rem">${rel(x.due)}</div></td><td>${x.ed.n}</td><td>${SVC[x.k].n}${x.q>1?' × '+x.q:''}</td><td>${esc(x.c.n)}</td><td><span class="pill ${lbl[x.status][0]}">${lbl[x.status][1]}</span></td></tr>`).join('');
+}
+
+/* ---------- add-booking form ---------- */
+function buildForm(){
+  const chk=(k,on)=>`<label for="s_${k}"><input type="checkbox" id="s_${k}" value="${k}" ${on?'checked':''}><span class="nm">${SVC[k].n}<span class="pr">${k==='reel'?inr(SVC[k].p)+' per reel':inr(SVC[k].p)}</span></span></label>`;
+  $('shootChecks').innerHTML=['cp','cv','tp','tv','dr','mx'].map(k=>chk(k,['cp','cv','dr'].includes(k))).join('');
+  $('postChecks').innerHTML=['cve','tve','reel','nve','cgv','cgp','gd','alb','cov'].map(k=>chk(k,['cve','reel','alb','cov'].includes(k))).join('');
+  const rebuild=ev=>{if(!ev||ev.target.id==='fDate'||ev.target.closest('#shootChecks'))buildCrewPick()};
+  $('addForm').addEventListener('input',ev=>{rebuild(ev);quote()});
+  buildCrewPick();quote();
+  $('addForm').addEventListener('submit',e=>{
+    e.preventDefault();const b=readForm();if(!b)return;
+    b.id='C'+(CLIENTS.length+10);NEW_ID=b.id;CLIENTS.push(b);save();compute();renderAll();buildCrewPick();
+    toast(`Added ${b.n}. Open Client management or Team management to see where it landed.`);
+  });
+}
+function buildCrewPick(){
+  const keep={};document.querySelectorAll('#crewPick select').forEach(x=>keep[x.dataset.k]=x.value);
+  const d=$('fDate').value,day=d?D(d):null;
+  const ks=[...document.querySelectorAll('#shootChecks input:checked')].map(i=>i.value);
+  $('crewPick').innerHTML=day==null||!ks.length?'<span class="muted" style="font-size:.8rem">Pick a date and tick a service to choose crew.</span>'
+    :ks.map(k=>`<label>${SVC[k].n}${crewSelect(day,k,keep[k]&&crewChoices(day,k).some(x=>x.t.id===keep[k]&&!x.why)?keep[k]:'',`data-k="${k}" aria-label="Crew for ${SVC[k].n}"`,null)}</label>`).join('');
+}
+function readForm(){
+  const n=$('fName').value.trim(),d=$('fDate').value;if(!n||!d)return null;
+  const s=[...document.querySelectorAll('#shootChecks input:checked')].map(i=>i.value);
+  const post={};document.querySelectorAll('#postChecks input:checked').forEach(i=>post[i.value]=i.value==='reel'?Math.max(1,+$('fReels').value||1):1);
+  const adv=+$('fAdv').value||0;
+  const crew={};document.querySelectorAll('#crewPick select').forEach(x=>{if(x.value&&s.includes(x.dataset.k))crew[x.dataset.k]=x.value});
+  return {n,ph:$('fPhone').value,em:'',ev:[{t:$('fType').value,d,v:$('fVenue').value||'Venue to be confirmed',s,crew}],post,done:[],pay:adv?[[S(TODAY),adv]]:[]};
+}
+function quote(){
+  const b=readForm();if(!b){$('qTotal').textContent='—';return}
+  const ev=eventValue(b.ev[0]),pv=postValue(b.post),tot=ev+pv;
+  $('qTotal').textContent=inr(tot);
+  $('qSplit').textContent=`Event day ${inr(ev)} · Editing ${inr(pv)} · 80% (${inr(tot*0.8)}) due by ${fd(D(b.ev[0].d)-7,{day:'numeric',month:'short',year:'numeric'})}`;
+}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,4500)}
+
+/* ---------- routing ---------- */
+const PAGES=['data','clients','team'];
+function route(){
+  const h=location.hash.slice(1);const p=PAGES.includes(h)?h:'data';
+  PAGES.forEach(x=>$('p-'+x).hidden=x!==p);
+  document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+p?'page':'false'));
+}
+/* ---------- leave calendar ---------- */
+let lvY=2026,lvM=10;
+function renderLeave(){
+  const first=Date.UTC(lvY,lvM,1)/864e5,dim=new Date(Date.UTC(lvY,lvM+1,0)).getUTCDate(),lead=(new Date(first*864e5).getUTCDay()+6)%7;
+  $('lvLbl').textContent=new Date(first*864e5).toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'UTC'});
+  let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('');
+  const cells=Math.ceil((lead+dim)/7)*7;
+  for(let i=0;i<cells;i++){
+    const day=first-lead+i,inM=i>=lead&&i<lead+dim;
+    const off=TEAM.filter(t=>t.leave.some(l=>D(l)===day));
+    h+=`<div class="day ${inM?'':'out'} ${day===TODAY?'today':''} ${off.length>=3?'many':''}"><span class="dn">${new Date(day*864e5).getUTCDate()}</span>${off.map(t=>{const cl=M.busy[t.id+'|'+day];return `<span class="chip lv ${cl?'cl':''}" title="${esc(t.n)} on leave${cl?' but picked for '+cl.map(e=>e.t+' · '+esc(e.c.n)).join(', '):''}">${esc(t.n.split(' ')[0])}${cl?' !':''}</span>`}).join('')}</div>`;
+  }
+  $('lvCal').innerHTML=h;
+  // upcoming list, grouped into ranges per person
+  const rows=[];
+  TEAM.forEach(t=>{const ds=[...new Set(t.leave.map(D))].sort((a,b)=>a-b);let st=null,pv=null;
+    ds.forEach(d=>{if(st===null){st=pv=d}else if(d===pv+1){pv=d}else{rows.push({t,a:st,b:pv});st=pv=d}});if(st!==null)rows.push({t,a:st,b:pv});});
+  const up=rows.filter(r=>r.b>=TODAY).sort((x,y)=>x.a-y.a);
+  $('lvList').innerHTML=up.map(r=>{const clash=[];for(let d=r.a;d<=r.b;d++){(M.busy[r.t.id+'|'+d]||[]).forEach(e=>clash.push(e))}
+    const n=r.b-r.a+1;
+    return `<li><span><b>${esc(r.t.n)}</b> <span class="muted">· ${esc(r.t.r)}</span>${clash.length?`<br><span class="pill p-bad">Reassign</span> <span class="muted" style="font-size:.78rem">picked for ${clash.map(e=>e.t+' · '+esc(e.c.n)).join(', ')}</span>`:''}</span><span class="when muted" style="font-size:.8rem">${r.a===r.b?fd(r.a):fd(r.a)+' – '+fd(r.b)} · ${n} day${n>1?'s':''} · ${rel(r.a)}</span><button type="button" class="x" data-lvdel="${r.t.id}|${r.a}|${r.b}" aria-label="Remove leave for ${esc(r.t.n)}">Remove</button></li>`}).join('')||'<li><span class="muted">No leave booked.</span></li>';
+}
+function leaveChanged(msg){save();const y=window.scrollY;compute();renderAll();buildCrewPick();window.scrollTo(0,y);toast(msg)}
+function buildLeaveForm(){
+  $('lvWho').innerHTML='<option value="">Choose person…</option>'+TEAM.map(t=>`<option value="${t.id}">${esc(t.n)} · ${esc(t.r)}</option>`).join('');
+  $('lvFrom').value=S(TODAY);
+  $('lvPrev').onclick=()=>{lvM--;if(lvM<0){lvM=11;lvY--}renderLeave()};
+  $('lvNext').onclick=()=>{lvM++;if(lvM>11){lvM=0;lvY++}renderLeave()};
+  $('lvForm').addEventListener('submit',ev=>{ev.preventDefault();
+    const t=TEAM.find(x=>x.id===$('lvWho').value);if(!t){toast('Pick a team member first.');return}
+    const a=D($('lvFrom').value),b=$('lvTo').value?D($('lvTo').value):a;
+    if(isNaN(a)||isNaN(b)||b<a){toast('Check the dates: "To" must be on or after "From".');return}
+    if(b-a>60){toast('Leave longer than 60 days: please add it in parts.');return}
+    for(let d=a;d<=b;d++){const k=S(d);if(!t.leave.includes(k))t.leave.push(k)}
+    t.leave.sort();
+    const d0=new Date(a*864e5);lvY=d0.getUTCFullYear();lvM=d0.getUTCMonth();
+    $('lvTo').value='';
+    leaveChanged(`Leave added for ${t.n}: ${a===b?fd(a):fd(a)+' – '+fd(b)}.`);
+  });
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-lvdel]');if(!b)return;
+    const [id,a,z]=b.dataset.lvdel.split('|');const t=TEAM.find(x=>x.id===id);
+    t.leave=t.leave.filter(l=>{const d=D(l);return d<+a||d>+z});
+    leaveChanged(`Leave removed for ${t.n}.`)});
+}
+/* ---------- client map: booking → shoot → edit → final delivery ---------- */
+let MAP_FILTER='all';
+function clientRoad(x){
+  const c=x.c,payD=c.pay.length?Math.min(...c.pay.map(p=>D(p[0]))):null;
+  const shot=x.evs.filter(e=>e.day<TODAY).length,ready=x.dl.filter(d=>d.done).length,finalDue=Math.max(x.last,...x.dl.map(d=>d.due));
+  const lateEdits=x.dl.filter(d=>!d.done&&d.due<TODAY).length;
+  const steps=[
+    {nm:'Booked',now:'Booked',dt:payD!=null?fd(payD):'—',ex:'30% advance',done:payD!=null},
+    {nm:'80% payment',now:'Waiting for 80% payment',dt:'by '+fd(x.first-7),ex:x.paid>=x.total*0.8-1?'received':'₹'+Math.round(x.total*0.8-x.paid).toLocaleString('en-IN')+' to collect',done:x.paid>=x.total*0.8-1,late:x.paid<x.total*0.8-1&&TODAY>x.first-7},
+    {nm:x.evs.length>1?'Shoot days':'Shoot day',now:TODAY<x.first?'Shoot coming up':'Shooting',dt:x.first===x.last?fd(x.first):fd(x.first)+' – '+fd(x.last),ex:x.evs.length>1?`${shot} of ${x.evs.length} done`:(shot?'done':rel(x.first)),done:TODAY>x.last},
+    {nm:'Editing',now:'Editing',dt:'by '+fd(finalDue),ex:`${ready} of ${x.dl.length} ready`+(lateEdits?` · ${lateEdits} late`:''),done:ready===x.dl.length&&TODAY>x.last,late:lateEdits>0},
+    {nm:'Final payment',now:'Waiting for final payment',dt:'on delivery',ex:x.paid>=x.total-1?'paid in full':'₹'+Math.round(x.total-x.paid).toLocaleString('en-IN')+' left',done:x.paid>=x.total-1}];
+  // "you are here" follows the real process (dates), not just payments; missed payments behind it turn red
+  let cur;
+  if(TODAY<x.first)cur=steps[1].done?2:1;
+  else if(TODAY<=x.last)cur=2;
+  else if(!steps[3].done)cur=3;
+  else if(!steps[4].done)cur=4;
+  else cur=-1;
+  steps.forEach((st,i)=>{if(!st.done&&cur!==-1&&i<cur)st.late=true});
+  const allDone=cur===-1;
+  const goal={nm:'Delivered to client',done:allDone,items:x.dl.map(d=>({n:SVC[d.k].n+(d.q>1?' ×'+d.q:''),ok:d.done,lt:!d.done&&d.due<TODAY,due:d.due}))};
+  return {steps,cur,goal,allDone};
+}
+function renderMap(){
+  const C=[...M.clients].sort((a,b)=>a.first-b.first);
+  const roads=C.map(x=>({x,r:clientRoad(x)}));
+  const nowName=r=>r.allDone?'Delivered':r.steps[r.cur].now;
+  const groups=[['all','All clients'],['Waiting for 80%','Waiting for 80%'],['Shoot coming','Shoot coming up'],['Shooting','Shooting'],['Editing','Editing'],['Waiting for final','Final payment'],['Delivered','Delivered']];
+  const match=(r,g)=>g==='all'||nowName(r).startsWith(g);
+  $('mapSum').innerHTML=groups.map(([g,l])=>{const n=roads.filter(o=>match(o.r,g)).length;return n||g==='all'?`<button type="button" data-mf="${g}" aria-pressed="${MAP_FILTER===g}">${l}<b>${n}</b></button>`:''}).join('');
+  $('mapList').innerHTML=roads.filter(o=>match(o.r,MAP_FILTER)).map(({x,r})=>{
+    const stops=r.steps.map((st,i)=>{const cls=[st.done?'done':'',i===r.cur?'now':'',st.late&&!st.done?'late':''].join(' ');
+      return `<div class="stop ${cls}">${i===r.cur?'<span class="here">You are here</span>':''}<div class="dot">${st.done?'✓':i+1}</div><div class="nm">${st.nm}</div><div class="dt">${st.dt}</div><div class="ex">${st.ex}</div></div>`}).join('');
+    const g=r.goal;
+    const goal=`<div class="stop goal ${g.done?'done':''}">${r.allDone?'<span class="here">Complete</span>':''}<div class="flag">⚑</div><div class="nm">${g.nm}</div><div class="out">${g.items.map(it=>`<span class="${it.ok?'ok':it.lt?'lt':''}" title="${it.ok?'Ready':'Due '+fd(it.due)}">${it.ok?'✓ ':''}${esc(it.n)}</span>`).join('')}</div></div>`;
+    const evs=x.evs.map(e=>e.t).join(', ');
+    return `<div class="mcard"><div class="mhead"><b>${esc(x.c.n)}</b><span class="muted">${esc(evs)} · ₹${x.total.toLocaleString('en-IN')}</span><span class="where">Now: <em>${nowName(r)}</em></span></div><div class="road">${stops}${goal}</div></div>`}).join('')||'<p class="muted">No clients at this stage.</p>';
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mf]');if(b){MAP_FILTER=b.dataset.mf;renderMap()}});
+/* ---------- left-pane section switcher on output pages ---------- */
+const NAVIC=(()=>{const w=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;return{
+plus:w('<path d="M12 5v14M5 12h14"/>'),
+pay:w('<path d="M7 5h10M7 9h10M8 5c4 0 6 1.6 6 4s-2 4-6 4h-1l7 6"/>'),
+list:w('<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/>'),
+team:w('<circle cx="9" cy="9" r="3"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><circle cx="17" cy="8" r="2.4"/><path d="M16 13.6c2.4-.2 4.2 1.2 4.6 3.9"/>'),
+tag:w('<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.4"/>'),
+info:w('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.2"/>')}})();
+function buildSidenavs(){document.querySelectorAll('.split').forEach(sp=>{
+  const key='studio-desk-sec-'+sp.dataset.split,panes=[...sp.querySelectorAll('.pane')],nav=sp.querySelector('.sidenav');
+  let cur;try{cur=localStorage.getItem(key)}catch(e){}
+  const ord=[...panes].sort((a,b)=>(+a.dataset.order||0)-(+b.dataset.order||0));
+  if(!panes.some(x=>x.dataset.sec===cur))cur=ord[0].dataset.sec;
+  nav.innerHTML=ord.map(x=>`<button type="button" data-go="${x.dataset.sec}"><span class="lbl">${x.dataset.icon&&NAVIC[x.dataset.icon]?'<span class="ic" aria-hidden="true">'+NAVIC[x.dataset.icon]+'</span>':''}<span>${x.dataset.label}</span></span>${x.dataset.count?'<span class="cnt" data-cnt="'+x.dataset.count+'"></span>':''}</button>`).join('');
+  const show=sec=>{panes.forEach(x=>x.hidden=x.dataset.sec!==sec);nav.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.go===sec?'true':'false'));try{localStorage.setItem(key,sec)}catch(e){}};
+  nav.addEventListener('click',e=>{const b=e.target.closest('button[data-go]');if(b)show(b.dataset.go)});
+  show(cur);});updateCounts();}
+function updateCounts(){document.querySelectorAll('.sidenav .cnt').forEach(c=>{const ul=$(c.dataset.cnt);const n=ul?[...ul.children].filter(li=>!li.querySelector('.p-good')).length:0;c.textContent=n;c.hidden=!n})}
+function renderAll(){renderData();renderClients();renderMap();renderTeam();renderLeave();updateCounts()}
+/* ---------- saving: entries stay in this browser until "Reset sample data" ---------- */
+const SAVE_KEY='studio-desk-v1';
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({clients:CLIENTS,leave:Object.fromEntries(TEAM.map(t=>[t.id,t.leave]))}))}catch(e){}}
+function load(){try{let v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(Array.isArray(v))v={clients:v};if(v&&Array.isArray(v.clients)&&v.clients.length){CLIENTS.splice(0,CLIENTS.length,...v.clients);if(v.leave)TEAM.forEach(t=>{if(Array.isArray(v.leave[t.id]))t.leave=v.leave[t.id]});return true}}catch(e){}return false}
+function payHint(){
+  const c=M&&M.clients.find(x=>x.c.id===$('pClient').value);
+  $('pHint').innerHTML=c?`<b>${esc(c.c.n)}</b> · package ${inr(c.total)} · received ${inr(c.paid)} · balance <b>${inr(c.total-c.paid)}</b>${c.nextAmt>0?` · next ${inr(c.nextAmt)} due by ${fd(c.nextDue)}`:' · fully paid'}`:'Pick a client to see what they have paid so far and what is still due.';
+}
+function buildPayForm(){
+  $('pDate').value=S(TODAY);
+  $('pClient').addEventListener('change',()=>{payHint();const c=M.clients.find(x=>x.c.id===$('pClient').value);if(c&&c.nextAmt>0&&!$('pAmt').value)$('pAmt').value=Math.round(c.nextAmt)});
+  $('payForm').addEventListener('submit',ev=>{
+    ev.preventDefault();
+    const c=CLIENTS.find(x=>x.id===$('pClient').value),amt=Math.round(+$('pAmt').value),d=$('pDate').value;
+    if(!c){toast('Choose which client paid.');return}
+    if(!(amt>0)){toast('Enter the amount received, in rupees.');return}
+    if(!d){toast('Enter the date the money came in.');return}
+    CLIENTS.forEach(x=>x.pay.forEach(p=>{p.length=Math.min(p.length,4)}));
+    c.pay.push([d,amt,$('pMode').value,$('pNote').value.trim(),1]);
+    save();compute();renderAll();
+    $('pAmt').value='';$('pNote').value='';
+    const x=M.clients.find(y=>y.c.id===c.id);
+    toast(`Recorded ${inr(amt)} from ${c.n}. Balance now ${inr(x.total-x.paid)}.`);
+  });
+}
+$('calPrev').onclick=()=>{calM--;if(calM<0){calM=11;calY--}renderCal()};
+$('calNext').onclick=()=>{calM++;if(calM>11){calM=0;calY++}renderCal()};
+$('todayLbl').textContent=fd(TODAY,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+if(!load())seedSampleCrew();compute();buildForm();buildPayForm();buildLeaveForm();renderAll();buildSidenavs();route();
+document.querySelector('.bilink').addEventListener('click',e=>{e.preventDefault();$('biCard').scrollIntoView({behavior:'smooth',block:'start'})});
+$('resetBtn').addEventListener('click',()=>{try{localStorage.removeItem(SAVE_KEY)}catch(e){}location.reload()});
+document.addEventListener('change',ev=>{
+  const sel=ev.target.closest('select[data-ev]');if(!sel)return;
+  const e=M.events.find(x=>x.id===sel.dataset.ev);if(!e)return;
+  e.src.crew=e.src.crew||{};
+  if(sel.value)e.src.crew[sel.dataset.k]=sel.value;else delete e.src.crew[sel.dataset.k];
+  save();
+  const y=window.scrollY;compute();renderAll();buildCrewPick();window.scrollTo(0,y);
+  const t=TEAM.find(x=>x.id===sel.value);
+  toast(t?`${t.n} is now on ${SVC[sel.dataset.k].n} for ${e.c.n}, ${fd(e.day)}.`:`${SVC[sel.dataset.k].n} for ${e.c.n} is unassigned.`);
+});
+window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0)});
+</script>
+</body>
+</html>
