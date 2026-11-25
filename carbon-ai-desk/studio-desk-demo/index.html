@@ -444,6 +444,42 @@ nav.tabs a[aria-current="page"] .step,.sidenav .cnt,.bicost,.avail th.tod,.tagc,
 .quote .eyebrow,.quote .muted{color:rgba(0,0,0,.72)!important}
 .quote .btn{background:#000!important;color:#fff!important}
 .stop.done .dot{color:#000}
+
+/* ===== Phone: Liquid Glass bottom tab bar, dual tone (black glass + Sky Blue) ===== */
+.tabbar{display:none}
+@media (max-width:760px){
+  /* ambient backdrop so the glass has colour to pick up */
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+    radial-gradient(28rem 22rem at 15% 105%,rgba(56,189,248,.22),transparent 62%),
+    radial-gradient(24rem 20rem at 90% 95%,rgba(99,102,241,.18),transparent 62%),
+    radial-gradient(30rem 24rem at 50% -8%,rgba(56,189,248,.10),transparent 60%)}
+  body{background:#000;padding-bottom:calc(108px + env(safe-area-inset-bottom,0px))}
+  header > .wrap:last-child{display:none}
+  body>header .today{display:none}
+  body>header .brand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100vw - 90px)}
+  body>header .brand h1{font-size:1.2rem}
+  body>header .hd{padding-block:10px}
+  body>header{background:rgba(0,0,0,.55)!important;backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%)}
+  .tabbar{display:flex;position:fixed;z-index:60;left:16px;right:16px;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    max-width:440px;margin:0 auto;padding:6px;gap:4px;border-radius:9999px;
+    background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(179,179,179,.05)),rgba(22,22,27,.55);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 18px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.5),inset 0 0 0 1px rgba(255,255,255,.1),inset 0 -1px 0 rgba(255,255,255,.06);
+    backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%)}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border-radius:9999px;
+    text-decoration:none;color:rgba(235,235,245,.72);font-size:.7rem;font-weight:600;letter-spacing:0;background:transparent;border:0;
+    transition:background .3s var(--ease),color .3s var(--ease),transform .15s var(--ease);-webkit-tap-highlight-color:transparent}
+  .tabbar a svg{width:22px;height:22px}
+  .tabbar a:active{transform:scale(.94)}
+  .tabbar a[aria-current="page"]{color:#000;background:linear-gradient(155deg,rgba(125,211,252,.98),rgba(56,189,248,.92));
+    box-shadow:0 6px 18px rgba(56,189,248,.35),inset 0 1px 0 rgba(255,255,255,.6),inset 0 0 0 1px rgba(255,255,255,.18)}
+  .tabbar a:focus-visible{outline:2px solid #38BDF8;outline-offset:2px}
+  .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+  footer.site{margin-bottom:0}
+  /* section switcher on phone: dual-tone glass chips */
+  .sidenav{background:rgba(28,28,30,.6)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(255,255,255,.06)}
+}
+@media (prefers-reduced-motion:reduce){.tabbar a{transition:none}}
 </style>
 </head>
 <body>
@@ -596,6 +632,7 @@ nav.tabs a[aria-current="page"] .step,.sidenav .cnt,.bicost,.avail th.tod,.tagc,
     </div>
   </section>
 </main>
+<nav class="tabbar" aria-label="Pages"><a href="#data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 7.5l3 3"/></svg><span>Enter data</span></a><a href="#clients"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.8 3.7-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg><span>Clients</span></a><a href="#team"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3 19.5c.6-3.2 3-4.8 6-4.8s5.4 1.6 6 4.8"/><circle cx="17" cy="8" r="2.4"/><path d="M16 13.2c2.6-.2 4.5 1.3 5 4.3"/></svg><span>Team</span></a></nav>
 <footer class="site"><div class="wrap"><span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M52.8 20 L32 8 L11.2 20 L11.2 44 L32 56 L52.8 44" fill="none" stroke="#F3EEEE" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="52.8" cy="32" r="5.5" fill="#38BDF8"/></svg><b>Carbon AI Desk</b> by Carbon AI Labs · carbonailabs.in</span><span>Sample dashboard · names and figures are made up</span></div></footer>
 <div class="toast" id="toast" hidden></div>
 
@@ -974,10 +1011,10 @@ let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clear
 
 /* ---------- routing ---------- */
 const PAGES=['data','clients','team'];
-function route(){
+function route(){if(window.matchMedia('(max-width:760px)').matches)window.scrollTo(0,0);
   const h=location.hash.slice(1);const p=PAGES.includes(h)?h:'data';
   PAGES.forEach(x=>$('p-'+x).hidden=x!==p);
-  document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+p?'page':'false'));
+  document.querySelectorAll('nav.tabs a, nav.tabbar a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+p?'page':'false'));
 }
 /* ---------- leave calendar ---------- */
 let lvY=2026,lvM=10;
