@@ -198,6 +198,12 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 .top nav .desk-link::after{content:"";position:absolute;right:-1.1rem;top:22%;bottom:22%;width:1px;background:var(--line)}
 /* pills restyled to the light header: white chip, hairline border, brand colour kept in the dot */
 .top nav .studio-link,.top nav .desk-link{background:#fff;color:var(--carbon);border:1px solid var(--line);padding:.4rem .8rem;font-weight:500;box-shadow:0 1px 2px rgba(28,27,31,.04)}
+.top nav .studio-link::before,.top nav .desk-link::before{display:none}
+/* product lockup in the words: Carbon + AI in crimson + product name in its colour (readable shade on white) */
+.top nav .studio-link,.top nav .desk-link{gap:.28em}
+.top nav .ai{color:var(--crimson)}
+.top nav .studio-link .pn{color:#8A6A00;font-weight:600}
+.top nav .desk-link .pn{color:#0284C7;font-weight:600}
 .top nav .studio-link:hover{color:var(--carbon);border-color:#F5C518;background:#FFFCF0}
 .top nav .desk-link:hover{color:var(--carbon);border-color:#38BDF8;background:#F2FAFE}
 @media (max-width:560px){.top nav .studio-link + .desk-link{margin-left:0}.top nav .desk-link{margin-right:0}.top nav .desk-link::after{display:none}}
@@ -207,8 +213,8 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
   <div class="wrap">
     <a href="#top" aria-label="Carbon AI Labs home"><img src="assets/logo-light.svg" alt="Carbon AI Labs" width="173" height="44"></a>
     <nav aria-label="Main">
-      <a href="/carbon-ai-studio/" class="studio-link">Carbon AI Studio</a>
-      <a href="/carbon-ai-desk/" class="desk-link">Carbon AI Desk</a>
+      <a href="/carbon-ai-studio/" class="studio-link">Carbon <span class="ai">AI</span> <span class="pn">Studio</span></a>
+      <a href="/carbon-ai-desk/" class="desk-link">Carbon <span class="ai">AI</span> <span class="pn">Desk</span></a>
       <a href="#products">Products</a>
       <a href="#services">Services</a>
       <a href="#about">About</a>
