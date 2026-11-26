@@ -30,6 +30,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <script src="/assets/analytics.js" defer></script>
+<link rel="stylesheet" href="/assets/motion.css">
+<script src="/assets/motion.js" defer></script>
 <style>
 /* Carbon AI Studio: black + yellow dual tone, crimson only as the logo dot and small marks. Same theme as the brochure. */
 :root{
@@ -200,6 +202,16 @@ footer .pb b{color:var(--ink);font-weight:600}
 footer nav{display:flex;gap:1.1rem;flex-wrap:wrap}
 footer a{text-decoration:none}
 footer a:hover{color:var(--gold)}
+
+/* motion layer hooks (see /assets/motion.css) */
+.three > div .band-art{margin-top:.5rem;color:var(--on-gold)}
+.band .art{max-width:200px;--art-bg:var(--gold);--art-acc:var(--crimson)}
+.band .foot{flex-wrap:nowrap}
+.band .foot .marquee{flex:1 1 auto}
+.band .foot > span:last-child{flex:none;white-space:nowrap}
+@media (max-width:720px){.band .art{max-width:130px}}
+@media (max-width:560px){.band .foot{flex-wrap:wrap}}
+.hero > .lattice,.hero > .ring{z-index:0}
 </style>
 </head>
 <body>
@@ -234,7 +246,8 @@ footer a:hover{color:var(--gold)}
 </header>
 
 <main id="top">
-  <section class="hero">
+  <section class="hero has-wave">
+    <canvas class="wave" data-wave data-ink="242,240,234" data-acc="245,197,24" data-alpha="0.3" aria-hidden="true"></canvas>
     <svg class="lattice" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
       <defs>
         <pattern id="hexgrid" width="51.96" height="90" patternUnits="userSpaceOnUse">
@@ -251,20 +264,20 @@ footer a:hover{color:var(--gold)}
     <svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M52.8 20 L32 8 L11.2 20 L11.2 44 L32 56 L52.8 44" fill="none" stroke="#F5C518" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
 
     <div class="wrap">
-      <h1>Carbon<br><span class="y">AI Studio</span></h1>
-      <div class="tag">
+      <h1 class="rv" style="--i:0">Carbon<br><span class="y">AI Studio</span></h1>
+      <div class="tag rv" style="--i:1">
         <div class="bar" aria-hidden="true"><i></i><i></i></div>
         <p><b>AI avatar</b> videos for modern brands</p>
       </div>
-      <div class="hero-cta">
+      <div class="hero-cta rv" style="--i:2">
         <a class="btn gold" href="#contact">Start a project <svg aria-hidden="true"><use href="#arrow"/></svg></a>
         <a class="btn ghost" href="#packs">See the packs</a>
       </div>
 
-      <div class="finder">
+      <div class="finder rv" style="--i:3">
         <i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i>
         <div class="kicker">AI avatar marketing · Chennai</div>
-        <h2>No models. No cameras. <span class="y">No studio.</span></h2>
+        <h2 data-type>No models. No cameras. <span class="y">No studio.</span></h2>
         <p>Skip the shoot. We create lifelike AI presenters who speak for your business, so you never have to hire models, book a studio or set up cameras. Bring your own script, or we write it after a session on your business. Every order is a one-off project, quoted for you. No subscriptions.</p>
       </div>
     </div>
@@ -272,43 +285,43 @@ footer a:hover{color:var(--gold)}
 
   <section class="band" aria-label="What we make">
     <div class="wrap">
-      <div class="three">
-        <div><div class="n">01</div><h3>Avatar videos</h3><p>Short videos with an AI presenter</p></div>
-        <div><div class="n">02</div><h3>Brand avatars</h3><p>Your own face or a brand character</p></div>
-        <div><div class="n">03</div><h3>Script consulting</h3><p>Your business turned into scripts</p></div>
+      <div class="three" data-stagger>
+        <div class="rv"><div class="n">01</div><h3>Avatar videos</h3><p>Short videos with an AI presenter</p><div class="band-art" data-art="fan"></div></div>
+        <div class="rv"><div class="n">02</div><h3>Brand avatars</h3><p>Your own face or a brand character</p><div class="band-art" data-art="orbit"></div></div>
+        <div class="rv"><div class="n">03</div><h3>Script consulting</h3><p>Your business turned into scripts</p><div class="band-art" data-art="globe"></div></div>
       </div>
-      <div class="foot"><span>One-off projects · No subscriptions · Made in India</span><span>Ready in 2 to 3 working days</span></div>
+      <div class="foot"><span data-marquee>One-off projects · No subscriptions · Made in India</span><span>Ready in 2 to 3 working days</span></div>
     </div>
   </section>
 
   <section class="sec" id="packs">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">Packages</div>
         <h2>Pick a pack.<br><span class="y">Pay once per project.</span></h2>
         <p>Each pack is a one-time project, quoted for your business. No monthly plans: order when you need videos, and every final video is yours.</p>
       </div>
 
-      <div class="ledger">
-        <article class="pack">
+      <div class="ledger" data-stagger>
+        <article class="pack rv">
           <div class="hex" style="color:var(--on-gold)"><svg aria-hidden="true"><use href="#hexfill"/></svg><span>01</span></div>
           <div><h3>Avatar Starter</h3><div class="sub">Script: you provide it</div></div>
           <ul><li>One avatar video up to 45 seconds with an AI presenter</li><li>One round of revisions</li></ul>
           <div class="price"><small>from</small><b>₹2,999</b></div>
         </article>
-        <article class="pack">
+        <article class="pack rv">
           <div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>02</span></div>
           <div><h3>Avatar Campaign</h3><div class="sub">Script: you provide it, or we write it</div></div>
           <ul><li>A set of videos with one consistent presenter and voice</li><li>Two rounds of revisions on each video</li></ul>
           <div class="price"><small>per project</small><b>Quoted</b></div>
         </article>
-        <article class="pack">
+        <article class="pack rv">
           <div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>03</span></div>
           <div><h3>Brand Avatar</h3><div class="sub">Script: we write it after consulting with you</div></div>
           <ul><li>A custom AI avatar of the owner, made only with signed consent, or a brand character</li><li>Your first videos with it; the avatar is reused on later orders</li></ul>
           <div class="price"><small>per project</small><b>Quoted</b></div>
         </article>
-        <article class="pack addon">
+        <article class="pack addon rv">
           <div class="hex"><svg aria-hidden="true"><use href="#hexred"/></svg><span>+</span></div>
           <div><h3>Business consulting</h3><div class="sub">Add-on to any pack</div></div>
           <ul><li>A session on your business, your offer and your audience</li><li>We turn it into scripts ready for your videos</li></ul>
@@ -316,7 +329,7 @@ footer a:hover{color:var(--gold)}
         </article>
       </div>
 
-      <div class="incl">
+      <div class="incl rv">
         <p><b>In every pack:</b> captions, a logo end card, the sizes you need (9:16, 1:1 and 16:9) and delivery as MP4.</p>
         <p><b>Not included:</b> paid ads, posting to your accounts, and music beyond our own original tracks.</p>
       </div>
@@ -325,42 +338,42 @@ footer a:hover{color:var(--gold)}
 
   <section class="sec" id="how">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">How it works</div>
         <h2>Brief to finished video in <span class="y">2 to 3 working days.</span></h2>
         <p>You sign off twice: once on the script, before we make anything, and once on the video, before delivery.</p>
       </div>
-      <ol class="steps" style="list-style:none;margin:0;padding:0">
-        <li class="step"><div class="hex" style="color:var(--on-gold)"><svg aria-hidden="true"><use href="#hexfill"/></svg><span>01</span></div><h3>Brief</h3><p>Your goal, offer, audience, language and sizes</p></li>
-        <li class="step"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>02</span></div><h3>Quote</h3><p>Your price and a secure payment link</p></li>
-        <li class="step"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>03</span></div><h3>Script <span class="sign">Sign-off</span></h3><p>You approve the script before we make anything</p></li>
-        <li class="step"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>04</span></div><h3>Delivery <span class="sign">Sign-off</span></h3><p>You review the video, we revise, you get the MP4s</p></li>
+      <ol data-stagger class="steps" style="list-style:none;margin:0;padding:0">
+        <li class="step rv"><div class="hex" style="color:var(--on-gold)"><svg aria-hidden="true"><use href="#hexfill"/></svg><span>01</span></div><h3>Brief</h3><p>Your goal, offer, audience, language and sizes</p></li>
+        <li class="step rv"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>02</span></div><h3>Quote</h3><p>Your price and a secure payment link</p></li>
+        <li class="step rv"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>03</span></div><h3>Script <span class="sign">Sign-off</span></h3><p>You approve the script before we make anything</p></li>
+        <li class="step rv"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>04</span></div><h3>Delivery <span class="sign">Sign-off</span></h3><p>You review the video, we revise, you get the MP4s</p></li>
       </ol>
     </div>
   </section>
 
   <section class="sec" id="promises">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">Our promises</div>
         <h2>Made with care, <span class="y">and with consent.</span></h2>
       </div>
-      <div class="promises">
-        <article class="promise"><span class="k">01</span><h3>Consent comes first</h3><p>A real face or voice is used only with that person's signed consent. Never celebrities or stock photos of real people.</p></article>
-        <article class="promise"><span class="k">02</span><h3>Honest scripts</h3><p>Scripts follow ASCI rules, with no promises we cannot prove. Videos are labelled as AI-made where platforms ask.</p></article>
-        <article class="promise"><span class="k">03</span><h3>You own the video</h3><p>Every final video is yours. Your photos and recordings are deleted 30 days after delivery unless you ask us to keep them.</p></article>
+      <div class="promises" data-stagger>
+        <article class="promise rv"><span class="k">01</span><h3>Consent comes first</h3><p>A real face or voice is used only with that person's signed consent. Never celebrities or stock photos of real people.</p></article>
+        <article class="promise rv"><span class="k">02</span><h3>Honest scripts</h3><p>Scripts follow ASCI rules, with no promises we cannot prove. Videos are labelled as AI-made where platforms ask.</p></article>
+        <article class="promise rv"><span class="k">03</span><h3>You own the video</h3><p>Every final video is yours. Your photos and recordings are deleted 30 days after delivery unless you ask us to keep them.</p></article>
       </div>
     </div>
   </section>
 
   <section class="contact" id="contact">
     <div class="wrap">
-      <div>
+      <div class="rv">
         <h2>Start a project.<br>Tell us what your video should say.</h2>
         <p class="lead">Write to us with your business, your offer and where the video will run. We reply with an approach and a quote.</p>
         <p class="who"><b>Ajay Andrews</b>Founder and CEO, Carbon AI Labs</p>
       </div>
-      <div class="links">
+      <div class="links rv" style="--i:1">
         <a href="mailto:customersupport@carbonailabs.in?subject=Carbon%20AI%20Studio%20quote%20request"><div><small>Email us</small><span>customersupport@carbonailabs.in</span></div><svg aria-hidden="true"><use href="#arrow"/></svg></a>
         <a href="https://wa.me/919790749165" target="_blank" rel="noopener"><div><small>Chat on WhatsApp</small><span>+91 97907 49165</span></div><svg aria-hidden="true"><use href="#arrow"/></svg></a>
         <a href="https://www.instagram.com/carbon_ailabs/" target="_blank" rel="noopener"><div><small>Follow on Instagram</small><span>@carbon_ailabs</span></div><svg aria-hidden="true"><use href="#arrow"/></svg></a>

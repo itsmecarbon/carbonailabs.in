@@ -1,0 +1,204 @@
+/* Carbon AI Labs motion layer. Plain JS, no libraries.
+   - .rv / .rv-fade / .grow-x / .art: revealed once when scrolled into view
+   - [data-wave]: slow moving line field drawn on a canvas (colours from data-ink / data-acc)
+   - [data-art="fan|orbit|globe"]: small line drawing that draws itself
+   - [data-type]: the text types itself out with a blinking cursor (screen readers get the full text)
+   - [data-marquee]: text strip that scrolls slowly
+   Reduced motion: nothing hides, nothing moves. */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  if (!reduce && 'IntersectionObserver' in window) root.classList.add('motion');
+
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var ART = {
+    fan: function () {
+      var s = '';
+      for (var i = 0; i < 9; i++) {
+        var y = 12 + i * 12;
+        s += '<path class="d' + (i % 2 ? ' soft' : '') + '" id="f' + i + '" pathLength="1" style="--k:' + i + '" d="M14 ' + y + ' C 84 ' + y + ', 104 60, 142 60"/>';
+      }
+      s += '<path class="d" pathLength="1" style="--k:10" d="M156 60 L206 60"/>';
+      s += '<circle class="node" cx="149" cy="60" r="6"/><circle class="acc" cx="210" cy="60" r="3.5"/>';
+      [1, 4, 7].forEach(function (i, n) {
+        s += '<circle class="acc" r="2.2"><animateMotion dur="2.6s" begin="' + (n * 0.85) + 's" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines=".4 0 .2 1"><mpath href="#f' + i + '"/></animateMotion></circle>';
+      });
+      return s;
+    },
+    orbit: function () {
+      var s = '<circle class="d" pathLength="1" cx="120" cy="60" r="44"/>';
+      s += '<circle class="d soft" pathLength="1" style="--k:4" cx="120" cy="60" r="26"/>';
+      [[120, 16], [164, 60], [120, 104], [76, 60]].forEach(function (p) {
+        s += '<circle class="node" cx="' + p[0] + '" cy="' + p[1] + '" r="4.5"/>';
+      });
+      s += '<g><circle class="acc" cx="120" cy="16" r="3.2"/><animateTransform attributeName="transform" type="rotate" from="0 120 60" to="360 120 60" dur="7s" repeatCount="indefinite"/></g>';
+      return s;
+    },
+    globe: function () {
+      var s = '<circle class="d" pathLength="1" cx="120" cy="60" r="46"/>';
+      s += '<ellipse class="d" pathLength="1" style="--k:3" cx="120" cy="60" rx="20" ry="46"/>';
+      s += '<ellipse class="d soft" pathLength="1" style="--k:5" cx="120" cy="60" rx="46" ry="46"><animate attributeName="rx" values="46;4;46" dur="7s" repeatCount="indefinite"/></ellipse>';
+      s += '<path class="d soft" pathLength="1" style="--k:6" d="M78 44 Q120 52 162 44"/>';
+      s += '<path class="d soft" pathLength="1" style="--k:7" d="M78 76 Q120 68 162 76"/>';
+      s += '<path class="d" pathLength="1" style="--k:8" d="M74 60 L166 60"/>';
+      s += '<circle class="node" cx="140" cy="38" r="4.5"/><circle class="acc" cx="102" cy="72" r="3.2"/>';
+      return s;
+    }
+  };
+
+  function buildArt(el) {
+    var kind = el.getAttribute('data-art');
+    if (!ART[kind]) return;
+    var svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 240 120');
+    svg.setAttribute('class', 'art');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    // ids must be unique per page
+    var uid = 'a' + Math.random().toString(36).slice(2, 7);
+    svg.innerHTML = ART[kind]().replace(/id="f/g, 'id="' + uid + 'f').replace(/href="#f/g, 'href="#' + uid + 'f');
+    el.appendChild(svg);
+    if (reduce && svg.pauseAnimations) { try { svg.pauseAnimations(); } catch (e) {} }
+    return svg;
+  }
+
+  function typeOut(el) {
+    var full = el.textContent.replace(/\s+/g, ' ').trim();
+    if (reduce) return;
+    var h = el.getBoundingClientRect().height;
+    el.style.minHeight = h + 'px';
+    var visual = document.createElement('span');
+    visual.setAttribute('aria-hidden', 'true');
+    while (el.firstChild) visual.appendChild(el.firstChild);
+    // collect text nodes and blank them, keeping the inner spans (colours) intact
+    var nodes = [], walker = document.createTreeWalker(visual, NodeFilter.SHOW_TEXT, null);
+    while (walker.nextNode()) nodes.push({ n: walker.currentNode, t: walker.currentNode.nodeValue });
+    nodes.forEach(function (o) { o.n.nodeValue = ''; });
+    var sr = document.createElement('span');
+    sr.className = 'sr-only';
+    sr.textContent = full;
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('aria-hidden', 'true');
+    el.appendChild(sr);
+    el.appendChild(visual);
+    el.classList.add('typed');
+    var idx = 0, ch = 0;
+    nodes.length && nodes[0].n.parentNode.appendChild(caret);
+    el._start = function () {
+      var speed = Math.max(18, Math.min(42, 1600 / full.length));
+      (function step() {
+        if (idx >= nodes.length) { setTimeout(function () { caret.remove(); el.style.minHeight = ''; }, 2600); return; }
+        var o = nodes[idx];
+        ch++;
+        o.n.nodeValue = o.t.slice(0, ch);
+        if (o.n.parentNode !== caret.parentNode || caret.previousSibling !== o.n) o.n.parentNode.insertBefore(caret, o.n.nextSibling);
+        if (ch >= o.t.length) { idx++; ch = 0; }
+        setTimeout(step, o.t.charAt(ch - 1) === ' ' ? speed * 0.6 : speed);
+      })();
+    };
+  }
+
+  function marquee(el) {
+    var text = el.textContent;
+    el.textContent = '';
+    el.classList.add('marquee');
+    var sr = document.createElement('span');
+    sr.className = 'sr-only';
+    sr.textContent = text;
+    var track = document.createElement('span');
+    track.className = 'track';
+    track.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < 8; i++) {
+      var s = document.createElement('span');
+      s.textContent = text;
+      track.appendChild(s);
+    }
+    el.appendChild(sr);
+    el.appendChild(track);
+  }
+
+  function wave(canvas) {
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var ink = canvas.getAttribute('data-ink') || '242,240,234';
+    var acc = canvas.getAttribute('data-acc') || '245,197,24';
+    var strength = parseFloat(canvas.getAttribute('data-alpha') || '0.34');
+    var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 1.5), running = false, raf = 0, last = 0, t0 = performance.now();
+    function size() {
+      var r = canvas.getBoundingClientRect();
+      w = Math.max(1, r.width); h = Math.max(1, r.height);
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function draw(t) {
+      ctx.clearRect(0, 0, w, h);
+      var lines = Math.round(Math.min(64, Math.max(28, h / 11)));
+      var gap = h / (lines - 1);
+      var stepX = Math.max(6, w / 140);
+      var hx = w * (0.62 + 0.12 * Math.sin(t * 0.00011)), hy = h * (0.45 + 0.15 * Math.cos(t * 0.00009));
+      ctx.lineWidth = 1;
+      for (var i = 0; i < lines; i++) {
+        var y0 = i * gap;
+        ctx.beginPath();
+        for (var x = -stepX; x <= w + stepX; x += stepX) {
+          var dx = (x - hx) / w, dy = (y0 - hy) / h;
+          var d = Math.sqrt(dx * dx * 1.4 + dy * dy);
+          var bump = Math.exp(-d * d * 7) * 46;
+          var y = y0 + Math.sin(x * 0.006 + t * 0.00042 + i * 0.22) * 7 + Math.sin(x * 0.013 - t * 0.0003) * 3 - bump * Math.sin(d * 9 - t * 0.0011);
+          if (x === -stepX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        var near = Math.exp(-Math.pow((y0 - hy) / h, 2) * 9);
+        ctx.strokeStyle = 'rgba(' + ink + ',' + (strength * (0.25 + 0.75 * near)).toFixed(3) + ')';
+        ctx.stroke();
+        if (i % 3 === 0 && near > 0.5) {
+          ctx.strokeStyle = 'rgba(' + acc + ',' + (strength * 0.55 * near).toFixed(3) + ')';
+          ctx.stroke();
+        }
+      }
+    }
+    function loop(now) {
+      if (!running) return;
+      if (now - last > 33) { draw(now - t0); last = now; }
+      raf = requestAnimationFrame(loop);
+    }
+    function start() { if (running || reduce) return; running = true; raf = requestAnimationFrame(loop); }
+    function stop() { running = false; cancelAnimationFrame(raf); }
+    size(); draw(9000);
+    window.addEventListener('resize', function () { size(); draw(performance.now() - t0); });
+    if (!reduce && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { es.forEach(function (e) { e.isIntersecting ? start() : stop(); }); }).observe(canvas);
+      document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+    }
+  }
+
+  function init() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-art]'), function (el) {
+      var svg = buildArt(el);
+      if (svg) svg.classList.add('rv-art');
+    });
+    if (root.classList.contains('motion')) Array.prototype.forEach.call(document.querySelectorAll('[data-type]'), typeOut);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-marquee]'), function (el) { if (!reduce) marquee(el); });
+    Array.prototype.forEach.call(document.querySelectorAll('canvas[data-wave]'), wave);
+
+    // stagger: children of [data-stagger] get --i in order
+    Array.prototype.forEach.call(document.querySelectorAll('[data-stagger]'), function (g) {
+      var kids = g.querySelectorAll('.rv, .rv-fade');
+      Array.prototype.forEach.call(kids, function (k, i) { if (!k.style.getPropertyValue('--i')) k.style.setProperty('--i', i); });
+    });
+
+    if (!root.classList.contains('motion')) return;
+    var targets = document.querySelectorAll('.rv, .rv-fade, .grow-x, .art, [data-type]');
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        if (e.target._start) { var s = e.target._start; e.target._start = null; setTimeout(s, 350); }
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    Array.prototype.forEach.call(targets, function (t) { io.observe(t); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
