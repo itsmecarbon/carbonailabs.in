@@ -190,6 +190,13 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 .service .svc-art{color:var(--carbon);margin:-.2rem 0 .1rem}
 .service .art{max-width:190px;--art-bg:#fff;--art-acc:var(--crimson)}
 .studio-band .wrap{z-index:1}
+/* header: product pills and links on one centred row, pills grouped, hairline divider */
+.top nav{align-items:center}
+.top nav a{line-height:1.2}
+.top nav .studio-link + .desk-link{margin-left:-.9rem}
+.top nav .desk-link{position:relative;margin-right:.35rem}
+.top nav .desk-link::after{content:"";position:absolute;right:-1.1rem;top:22%;bottom:22%;width:1px;background:var(--line)}
+@media (max-width:560px){.top nav .studio-link + .desk-link{margin-left:0}.top nav .desk-link{margin-right:0}.top nav .desk-link::after{display:none}}
 </style>
 
 <header class="top">

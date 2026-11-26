@@ -1,6 +1,6 @@
 /* Carbon AI Labs motion layer. Plain JS, no libraries.
    - .rv / .rv-fade / .grow-x / .art: revealed once when scrolled into view
-   - [data-wave]: slow moving line field drawn on a canvas (colours from data-ink / data-acc)
+   - [data-wave]: hexagon grid with a slow wave rippling through it drawn on a canvas (colours from data-ink / data-acc)
    - [data-art="fan|orbit|globe"]: small line drawing that draws itself
    - [data-type]: the text types itself out with a blinking cursor (screen readers get the full text)
    - [data-marquee]: text strip that scrolls slowly
@@ -131,29 +131,37 @@
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    // hexagon grid (the brand ring) with a slow wave rippling through it
+    function hexPath(cx, cy, r) {
+      ctx.beginPath();
+      for (var k = 0; k < 6; k++) {
+        var a = Math.PI / 180 * (60 * k - 90);
+        var x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
+        if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    }
     function draw(t) {
       ctx.clearRect(0, 0, w, h);
-      var lines = Math.round(Math.min(64, Math.max(28, h / 11)));
-      var gap = h / (lines - 1);
-      var stepX = Math.max(6, w / 140);
-      var hx = w * (0.62 + 0.12 * Math.sin(t * 0.00011)), hy = h * (0.45 + 0.15 * Math.cos(t * 0.00009));
+      var R = w < 600 ? 22 : 30, hw = Math.sqrt(3) * R, vh = 1.5 * R;
+      // wave source drifts slowly around the upper right
+      var ox = w * (0.78 + 0.08 * Math.sin(t * 0.00008)), oy = h * (0.3 + 0.12 * Math.cos(t * 0.00007));
+      var diag = Math.sqrt(w * w + h * h);
       ctx.lineWidth = 1;
-      for (var i = 0; i < lines; i++) {
-        var y0 = i * gap;
-        ctx.beginPath();
-        for (var x = -stepX; x <= w + stepX; x += stepX) {
-          var dx = (x - hx) / w, dy = (y0 - hy) / h;
-          var d = Math.sqrt(dx * dx * 1.4 + dy * dy);
-          var bump = Math.exp(-d * d * 7) * 46;
-          var y = y0 + Math.sin(x * 0.006 + t * 0.00042 + i * 0.22) * 7 + Math.sin(x * 0.013 - t * 0.0003) * 3 - bump * Math.sin(d * 9 - t * 0.0011);
-          if (x === -stepX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        var near = Math.exp(-Math.pow((y0 - hy) / h, 2) * 9);
-        ctx.strokeStyle = 'rgba(' + ink + ',' + (strength * (0.25 + 0.75 * near)).toFixed(3) + ')';
-        ctx.stroke();
-        if (i % 3 === 0 && near > 0.5) {
-          ctx.strokeStyle = 'rgba(' + acc + ',' + (strength * 0.55 * near).toFixed(3) + ')';
+      for (var row = -1, cy = -vh; cy < h + vh; row++, cy += vh) {
+        for (var cx = (row % 2 ? hw / 2 : 0) - hw; cx < w + hw; cx += hw) {
+          var dx = cx - ox, dy = cy - oy, d = Math.sqrt(dx * dx + dy * dy);
+          var wv = Math.sin(d * 0.016 - t * 0.0013);          // -1..1 ripple
+          var fall = Math.max(0, 1 - d / (diag * 0.85));        // fades away from the source
+          var lift = Math.max(0, wv);
+          var r = R * (0.9 + 0.08 * wv);
+          hexPath(cx, cy - lift * 4, r);
+          ctx.strokeStyle = 'rgba(' + ink + ',' + (strength * fall * (0.22 + 0.78 * lift)).toFixed(3) + ')';
           ctx.stroke();
+          if (wv > 0.82 && fall > 0.25) {
+            ctx.strokeStyle = 'rgba(' + acc + ',' + (strength * 1.6 * fall * (wv - 0.82) / 0.18).toFixed(3) + ')';
+            ctx.stroke();
+          }
         }
       }
     }
