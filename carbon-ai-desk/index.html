@@ -30,6 +30,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <script src="/assets/analytics.js" defer></script>
+<link rel="stylesheet" href="/assets/motion.css">
+<script src="/assets/motion.js" defer></script>
 <style>
 /* Carbon AI Desk: black + Sky Blue, the same layout as Carbon AI Studio (which is black + yellow). */
 :root{
@@ -220,6 +222,16 @@ footer a:hover{color:var(--gold)}
 .edition .more{color:var(--gold);font-weight:600;text-decoration:none}
 .edition .more:hover{text-decoration:underline}
 @media (max-width:820px){.editions{grid-template-columns:1fr}.edition ul{grid-template-columns:1fr}}
+
+/* motion layer hooks (see /assets/motion.css) */
+.three > div .band-art{margin-top:.5rem;color:var(--on-gold)}
+.band .art{max-width:200px;--art-bg:var(--gold);--art-acc:var(--on-gold)}
+.band .foot{flex-wrap:nowrap}
+.band .foot .marquee{flex:1 1 auto}
+.band .foot > span:last-child{flex:none;white-space:nowrap}
+@media (max-width:720px){.band .art{max-width:130px}}
+@media (max-width:560px){.band .foot{flex-wrap:wrap}}
+.hero > .lattice,.hero > .ring{z-index:0}
 </style>
 </head>
 <body>
@@ -254,7 +266,8 @@ footer a:hover{color:var(--gold)}
 </header>
 
 <main id="top">
-  <section class="hero">
+  <section class="hero has-wave">
+    <canvas class="wave" data-wave data-ink="242,240,234" data-acc="56,189,248" data-alpha="0.3" aria-hidden="true"></canvas>
     <svg class="lattice" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
       <defs>
         <pattern id="hexgrid" width="51.96" height="90" patternUnits="userSpaceOnUse">
@@ -271,20 +284,20 @@ footer a:hover{color:var(--gold)}
     <svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M52.8 20 L32 8 L11.2 20 L11.2 44 L32 56 L52.8 44" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
 
     <div class="wrap">
-      <h1>Carbon<br><span class="y">AI Desk</span></h1>
-      <div class="tag">
+      <h1 class="rv" style="--i:0">Carbon<br><span class="y">AI Desk</span></h1>
+      <div class="tag rv" style="--i:1">
         <div class="bar" aria-hidden="true"><i></i><i></i></div>
         <p><b>Dashboards, BI and AI</b> for your business</p>
       </div>
-      <div class="hero-cta">
+      <div class="hero-cta rv" style="--i:2">
         <a class="btn gold" href="#contact">Get your desk <svg aria-hidden="true"><use href="#arrow"/></svg></a>
         <a class="btn ghost" href="#desks">Meet Studio Desk</a>
       </div>
 
-      <div class="finder">
+      <div class="finder rv" style="--i:3">
         <i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i>
         <div class="kicker">IT and AI services · Chennai</div>
-        <h2>Your whole business, <span class="y">on one screen.</span></h2>
+        <h2 data-type>Your whole business, <span class="y">on one screen.</span></h2>
         <p>Every field runs on its own numbers. Carbon AI Desk turns yours into one simple dashboard: enquiries, bookings, payments, team and deliveries, in one place instead of notebooks and spreadsheets. We build a desk for each industry, set it up on Microsoft 365 and add the AI that takes the admin off your plate. You approve every step.</p>
       </div>
     </div>
@@ -292,18 +305,18 @@ footer a:hover{color:var(--gold)}
 
   <section class="band" aria-label="What a desk does">
     <div class="wrap">
-      <div class="three">
-        <div><div class="n">01</div><h3>Dashboards</h3><p>One screen for clients, money and work</p></div>
-        <div><div class="n">02</div><h3>BI and insights</h3><p>The numbers that grow your profit</p></div>
-        <div><div class="n">03</div><h3>AI automation</h3><p>Quotes, reminders and reports on autopilot</p></div>
+      <div class="three" data-stagger>
+        <div class="rv"><div class="n">01</div><h3>Dashboards</h3><p>One screen for clients, money and work</p><div class="band-art" data-art="fan"></div></div>
+        <div class="rv"><div class="n">02</div><h3>BI and insights</h3><p>The numbers that grow your profit</p><div class="band-art" data-art="orbit"></div></div>
+        <div class="rv"><div class="n">03</div><h3>AI automation</h3><p>Quotes, reminders and reports on autopilot</p><div class="band-art" data-art="globe"></div></div>
       </div>
-      <div class="foot"><span>Built on Microsoft 365 · Your data stays yours · Made in India</span><span>One desk per field</span></div>
+      <div class="foot"><span data-marquee>Built on Microsoft 365 · Your data stays yours · Made in India</span><span>One desk per field</span></div>
     </div>
   </section>
 
   <section class="sec" id="desks">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">The desks</div>
         <h2>One desk for every field.<br><span class="y">Studio Desk is the first.</span></h2>
         <p>Each desk is built around how one kind of business really works: its clients, its calendar, its money and its team. Studio Desk is ready for photography studios today. More desks are on the way.</p>
@@ -337,38 +350,38 @@ footer a:hover{color:var(--gold)}
 
   <section class="sec" id="services">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">What we build</div>
         <h2>Start with the dashboard.<br><span class="y">Add the rest when you're ready.</span></h2>
         <p>Every desk is put together from the services below. Each one is quoted for your business before we start, with no surprises later.</p>
       </div>
 
-      <div class="ledger">
-        <article class="pack">
+      <div class="ledger" data-stagger>
+        <article class="pack rv">
           <div class="hex" style="color:var(--on-gold)"><svg aria-hidden="true"><use href="#hexfill"/></svg><span>01</span></div>
           <div><h3>Business dashboard</h3><div class="sub">The heart of every desk</div></div>
           <ul><li>Clients, calendar, payments, team and deliveries on one screen</li><li>Your data moved in from notebooks or Excel, plus training for your team</li></ul>
           <div class="price"><small>per project</small><b>Quoted</b></div>
         </article>
-        <article class="pack">
+        <article class="pack rv">
           <div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>02</span></div>
           <div><h3>BI and insights</h3><div class="sub">Pick the modules you need</div></div>
           <ul><li>Revenue and profit, sales forecast, cash flow, marketing and customer numbers</li><li>Competitive pricing checks against businesses in your city</li></ul>
           <div class="price"><small>per module</small><b>Quoted</b></div>
         </article>
-        <article class="pack">
+        <article class="pack rv">
           <div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>03</span></div>
           <div><h3>AI automation</h3><div class="sub">You approve each step</div></div>
           <ul><li>Quote generators, booking replies, reminders and payment links</li><li>A daily 8 AM email with what needs you today</li></ul>
           <div class="price"><small>per workflow</small><b>Quoted</b></div>
         </article>
-        <article class="pack">
+        <article class="pack rv">
           <div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>04</span></div>
           <div><h3>Microsoft 365 and IT setup</h3><div class="sub">Business email, Teams and shared data</div></div>
           <ul><li>Staff accounts, business email and your desk as an app in Teams</li><li>Shared saving on Excel or SharePoint, so everyone sees the same numbers</li></ul>
           <div class="price"><small>per project</small><b>Quoted</b></div>
         </article>
-        <article class="pack addon">
+        <article class="pack addon rv">
           <div class="hex" style="color:#0284C7"><svg aria-hidden="true"><use href="#hexdeep"/></svg><span>+</span></div>
           <div><h3>Care plan</h3><div class="sub">Add-on, billed monthly</div></div>
           <ul><li>Hosting, backups, updates and fixes</li><li>Support on WhatsApp and email</li></ul>
@@ -376,7 +389,7 @@ footer a:hover{color:var(--gold)}
         </article>
       </div>
 
-      <div class="incl">
+      <div class="incl rv">
         <p><b>Always yours:</b> your data lives in your own Microsoft 365, and you can take it with you at any time.</p>
         <p><b>Not included:</b> Microsoft 365 licences, domain, WhatsApp API and payment gateway fees, charged at actual cost.</p>
       </div>
@@ -385,42 +398,42 @@ footer a:hover{color:var(--gold)}
 
   <section class="sec" id="how">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">How it works</div>
         <h2>From a quick chat to <span class="y">your own desk.</span></h2>
         <p>You sign off twice: once on the plan, before we build anything, and once on the finished desk, before it goes live.</p>
       </div>
-      <ol class="steps" style="list-style:none;margin:0;padding:0">
-        <li class="step"><div class="hex" style="color:var(--on-gold)"><svg aria-hidden="true"><use href="#hexfill"/></svg><span>01</span></div><h3>Chat</h3><p>How your business runs today and where the time goes</p></li>
-        <li class="step"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>02</span></div><h3>Plan <span class="sign">Sign-off</span></h3><p>The few services that help most, with a fixed quote</p></li>
-        <li class="step"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>03</span></div><h3>Build</h3><p>We set up your desk and move your data in</p></li>
-        <li class="step"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>04</span></div><h3>Go live <span class="sign">Sign-off</span></h3><p>We train your team and stay on call for help</p></li>
+      <ol data-stagger class="steps" style="list-style:none;margin:0;padding:0">
+        <li class="step rv"><div class="hex" style="color:var(--on-gold)"><svg aria-hidden="true"><use href="#hexfill"/></svg><span>01</span></div><h3>Chat</h3><p>How your business runs today and where the time goes</p></li>
+        <li class="step rv"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>02</span></div><h3>Plan <span class="sign">Sign-off</span></h3><p>The few services that help most, with a fixed quote</p></li>
+        <li class="step rv"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>03</span></div><h3>Build</h3><p>We set up your desk and move your data in</p></li>
+        <li class="step rv"><div class="hex" style="color:var(--gold)"><svg aria-hidden="true"><use href="#hexline"/></svg><span>04</span></div><h3>Go live <span class="sign">Sign-off</span></h3><p>We train your team and stay on call for help</p></li>
       </ol>
     </div>
   </section>
 
   <section class="sec" id="promises">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <div class="kicker">Our promises</div>
         <h2>Simple to use, <span class="y">and you stay in charge.</span></h2>
       </div>
-      <div class="promises">
-        <article class="promise"><span class="k">01</span><h3>Plain language</h3><p>We talk about your clients, your bookings and your money, never in tech terms.</p></article>
-        <article class="promise"><span class="k">02</span><h3>Start small</h3><p>Begin with the dashboard and add BI or automation only when you are ready.</p></article>
-        <article class="promise"><span class="k">03</span><h3>You stay in charge</h3><p>Automation drafts and reminds. A person approves anything that matters.</p></article>
+      <div class="promises" data-stagger>
+        <article class="promise rv"><span class="k">01</span><h3>Plain language</h3><p>We talk about your clients, your bookings and your money, never in tech terms.</p></article>
+        <article class="promise rv"><span class="k">02</span><h3>Start small</h3><p>Begin with the dashboard and add BI or automation only when you are ready.</p></article>
+        <article class="promise rv"><span class="k">03</span><h3>You stay in charge</h3><p>Automation drafts and reminds. A person approves anything that matters.</p></article>
       </div>
     </div>
   </section>
 
   <section class="contact" id="contact">
     <div class="wrap">
-      <div>
+      <div class="rv">
         <h2>Get your desk.<br>Built for your field.</h2>
         <p class="lead">Tell us what your business does and where it loses time. We reply with a plan and a quote, or a Studio Desk demo if you run a photography studio.</p>
         <p class="who"><b>Ajay Andrews</b>Founder and CEO, Carbon AI Labs</p>
       </div>
-      <div class="links">
+      <div class="links rv" style="--i:1">
         <a href="mailto:customersupport@carbonailabs.in?subject=Carbon%20AI%20Desk%20for%20my%20business"><div><small>Email us</small><span>customersupport@carbonailabs.in</span></div><svg aria-hidden="true"><use href="#arrow"/></svg></a>
         <a href="https://wa.me/919790749165" target="_blank" rel="noopener"><div><small>Chat on WhatsApp</small><span>+91 97907 49165</span></div><svg aria-hidden="true"><use href="#arrow"/></svg></a>
         <a href="https://www.instagram.com/carbon_ailabs/" target="_blank" rel="noopener"><div><small>Follow on Instagram</small><span>@carbon_ailabs</span></div><svg aria-hidden="true"><use href="#arrow"/></svg></a>

@@ -18,6 +18,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Public+Sans:wght@400;500;600&display=swap">
 <script src="assets/analytics.js" defer></script>
+<link rel="stylesheet" href="assets/motion.css">
+<script src="assets/motion.js" defer></script>
 </head>
 <body>
 <style>
@@ -183,6 +185,25 @@ footer{background:var(--carbon);color:var(--on-dark-2);font-size:.9rem}
 footer a{color:var(--on-dark);text-underline-offset:3px}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;padding-block:2rem}
 footer img{height:40px;width:auto;display:block;margin-left:-8px}
+/* motion layer hooks (see assets/motion.css) */
+.hero{overflow:hidden}
+.service .svc-art{color:var(--carbon);margin:-.2rem 0 .1rem}
+.service .art{max-width:190px;--art-bg:#fff;--art-acc:var(--crimson)}
+.studio-band .wrap{z-index:1}
+/* header: product pills and links on one centred row, pills grouped, hairline divider */
+.top nav{align-items:center}
+.top nav a{line-height:1.2}
+.top nav .studio-link + .desk-link{margin-left:-.9rem}
+.top nav .desk-link{position:relative;margin-right:.35rem}
+.top nav .desk-link::after{content:"";position:absolute;right:-1.1rem;top:22%;bottom:22%;width:1px;background:var(--line)}
+/* pills restyled to the light header: white chip, hairline border, brand colour kept in the dot */
+.top nav .studio-link,.top nav .desk-link{background:#fff;color:var(--carbon);border:1px solid var(--line);padding:.4rem .8rem;font-weight:500;box-shadow:0 1px 2px rgba(28,27,31,.04)}
+.top nav .studio-link:hover{color:var(--carbon);border-color:#F5C518;background:#FFFCF0}
+.top nav .desk-link:hover{color:var(--carbon);border-color:#38BDF8;background:#F2FAFE}
+/* both products in one grouped capsule with a hairline divider */
+.top nav .studio-link{border-radius:999px 0 0 999px;border-right:0;padding-right:.85rem}
+.top nav .studio-link + .desk-link{margin-left:-1.5rem;border-radius:0 999px 999px 0;padding-left:.85rem;box-shadow:inset 1px 0 0 var(--line),0 1px 2px rgba(28,27,31,.04)}
+@media (max-width:560px){.top nav .studio-link + .desk-link{margin-left:-.6rem}.top nav .desk-link{margin-right:0}.top nav .desk-link::after{display:none}}
 </style>
 
 <header class="top">
@@ -200,18 +221,19 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 </header>
 
 <main id="top">
-  <section class="hero">
+  <section class="hero has-wave">
+    <canvas class="wave" data-wave data-ink="28,27,31" data-acc="179,38,30" data-alpha="0.2" aria-hidden="true"></canvas>
     <div class="wrap">
       <div>
-        <span class="element" aria-label="Carbon, element 6"><b>C</b>6<span>12.011</span></span>
-        <h1>AI that solves <em>business problems.</em></h1>
-        <p class="lede">Carbon AI Labs researches and builds AI solutions to the problems that slow businesses down. We do work that is slow, repetitive and easy to get wrong with more speed and accuracy, so owners can serve more customers and grow revenue and profit. A person stays in charge of every decision that matters.</p>
-        <div class="actions">
+        <span class="element rv" style="--i:0" aria-label="Carbon, element 6"><b>C</b>6<span>12.011</span></span>
+        <h1 class="rv" style="--i:1">AI that solves <em>business problems.</em></h1>
+        <p class="lede rv" style="--i:2">Carbon AI Labs researches and builds AI solutions to the problems that slow businesses down. We do work that is slow, repetitive and easy to get wrong with more speed and accuracy, so owners can serve more customers and grow revenue and profit. A person stays in charge of every decision that matters.</p>
+        <div class="actions rv" style="--i:3">
           <a class="btn primary" href="#products">See our products</a>
           <a class="btn ghost" href="mailto:customersupport@carbonailabs.in">Email us</a>
         </div>
       </div>
-      <div class="lattice" aria-hidden="true">
+      <div class="lattice rv-fade" style="--i:2" aria-hidden="true">
         <svg viewBox="0 0 400 400" fill="none">
           <g stroke="#D9CFD0" stroke-width="4" stroke-linejoin="round"><path d="M200.0 -8.0 L245.0 18.0 L245.0 70.0 L200.0 96.0 L155.0 70.0 L155.0 18.0 Z" stroke-opacity="0.25"/><path d="M64.9 70.0 L109.9 96.0 L109.9 148.0 L64.9 174.0 L19.9 148.0 L19.9 96.0 Z" stroke-opacity="0.25"/><path d="M155.0 70.0 L200.0 96.0 L200.0 148.0 L155.0 174.0 L109.9 148.0 L109.9 96.0 Z" stroke-opacity="0.53"/><path d="M245.0 70.0 L290.1 96.0 L290.1 148.0 L245.0 174.0 L200.0 148.0 L200.0 96.0 Z" stroke-opacity="0.53"/><path d="M335.1 70.0 L380.1 96.0 L380.1 148.0 L335.1 174.0 L290.1 148.0 L290.1 96.0 Z" stroke-opacity="0.25"/><path d="M109.9 148.0 L155.0 174.0 L155.0 226.0 L109.9 252.0 L64.9 226.0 L64.9 174.0 Z" stroke-opacity="0.53"/><path d="M290.1 148.0 L335.1 174.0 L335.1 226.0 L290.1 252.0 L245.0 226.0 L245.0 174.0 Z" stroke-opacity="0.53"/><path d="M64.9 226.0 L109.9 252.0 L109.9 304.0 L64.9 330.0 L19.9 304.0 L19.9 252.0 Z" stroke-opacity="0.25"/><path d="M155.0 226.0 L200.0 252.0 L200.0 304.0 L155.0 330.0 L109.9 304.0 L109.9 252.0 Z" stroke-opacity="0.53"/><path d="M245.0 226.0 L290.1 252.0 L290.1 304.0 L245.0 330.0 L200.0 304.0 L200.0 252.0 Z" stroke-opacity="0.53"/><path d="M335.1 226.0 L380.1 252.0 L380.1 304.0 L335.1 330.0 L290.1 304.0 L290.1 252.0 Z" stroke-opacity="0.25"/><path d="M200.0 304.0 L245.0 330.0 L245.0 382.0 L200.0 408.0 L155.0 382.0 L155.0 330.0 Z" stroke-opacity="0.25"/></g>
           <g transform="translate(130.67 130.67) scale(2.1667)">
@@ -226,12 +248,12 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
   <section class="studio-band" id="studio" aria-labelledby="studio-title">
     <svg class="lat" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><defs><pattern id="studiohex" width="51.96" height="90" patternUnits="userSpaceOnUse"><path d="M25.98 0 L51.96 15 L51.96 45 L25.98 60 L0 45 L0 15 Z M25.98 60 L25.98 90" fill="none" stroke="#F5C518" stroke-width="0.8"/></pattern><radialGradient id="studiofade" cx="85%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="studiomask"><rect width="100%" height="100%" fill="url(#studiofade)"/></mask></defs><rect width="100%" height="100%" fill="url(#studiohex)" opacity=".1" mask="url(#studiomask)"/></svg>
     <div class="wrap">
-      <div>
+      <div class="rv">
         <span class="tagline">New from Carbon AI Labs</span>
         <h2 id="studio-title">Carbon <span>AI Studio</span></h2>
         <p><b>AI avatar videos for modern brands.</b> No models, no cameras, no studio. Lifelike AI presenters who speak for your business, made as one-off projects with no subscriptions.</p>
       </div>
-      <div class="side">
+      <div class="side rv" style="--i:1">
         <ul>
           <li>Avatar videos with an AI presenter</li>
           <li>Brand avatars of you or a brand character</li>
@@ -245,12 +267,12 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
   <section class="studio-band desk-band" id="desk" aria-labelledby="desk-title">
     <svg class="lat" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><defs><pattern id="deskhex" width="51.96" height="90" patternUnits="userSpaceOnUse"><path d="M25.98 0 L51.96 15 L51.96 45 L25.98 60 L0 45 L0 15 Z M25.98 60 L25.98 90" fill="none" stroke="#38BDF8" stroke-width="0.8"/></pattern><radialGradient id="deskfade" cx="85%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="deskmask"><rect width="100%" height="100%" fill="url(#deskfade)"/></mask></defs><rect width="100%" height="100%" fill="url(#deskhex)" opacity=".1" mask="url(#deskmask)"/></svg>
     <div class="wrap">
-      <div>
+      <div class="rv">
         <span class="tagline">Dashboards, BI and AI by Carbon AI Labs</span>
         <h2 id="desk-title">Carbon <span>AI Desk</span></h2>
         <p><b>Your whole business, on one screen.</b> One desk for every field: a dashboard, BI and AI automation built around how your business runs, on Microsoft 365. Studio Desk for photography studios is the first, and more desks are on the way.</p>
       </div>
-      <div class="side">
+      <div class="side rv" style="--i:1">
         <ul>
           <li>Business dashboards and BI reports</li>
           <li>AI automation and Microsoft 365 setup</li>
@@ -263,13 +285,13 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 
   <section class="block products" id="products">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <span class="eyebrow">Products</span>
         <h2>Our first products, in fitness</h2>
         <p>We started where the cost of manual work is clear: coaches and gyms writing every plan by hand. Both apps run on the same rules engine, and each rule is linked to the sports-science or nutrition source it comes from.</p>
       </div>
-      <div class="grid2">
-        <article class="product lead">
+      <div class="grid2" data-stagger>
+        <article class="product lead rv">
           <div class="row">
             <h3>Coach <i>AI</i></h3>
             <span class="status live">Onboarding coaches</span>
@@ -287,7 +309,7 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
           <p class="offer">Founding offer: 50% off for the first 6 months, for the first 10 coaches.</p>
           <a class="more" href="mailto:customersupport@carbonailabs.in?subject=Coach%20AI%20packs">Ask for packs and pricing</a>
         </article>
-        <article class="product">
+        <article class="product rv">
           <div class="row">
             <h3>CarbonFit <i>AI</i></h3>
             <span class="status">Gym pilot</span>
@@ -307,13 +329,14 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 
   <section class="block services" id="services">
     <div class="wrap">
-      <div class="head">
+      <div class="head rv">
         <span class="eyebrow">Services</span>
         <h2>AI work for businesses that are losing time</h2>
         <p>Our products began in fitness, but the same approach works anywhere a team repeats slow, manual work. We study how the work is done today, build a system that does it faster and with fewer mistakes, and keep a person in charge of every decision that matters.</p>
       </div>
-      <div class="grid3">
-        <article class="service">
+      <div class="grid3" data-stagger>
+        <article class="service rv">
+          <div class="svc-art" data-art="orbit"></div>
           <h3>Fitness and coaching</h3>
           <ul>
             <li><span><b>Coach AI</b> for freelance trainers, influencers and prep coaches, in three packs</span></li>
@@ -322,7 +345,8 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
             <li><span><b>CarbonFit AI for gyms:</b> a personal plan for every member on the day they join</span></li>
           </ul>
         </article>
-        <article class="service">
+        <article class="service rv">
+          <div class="svc-art" data-art="fan"></div>
           <h3>AI automation for small businesses</h3>
           <ul>
             <li><span><b>Workflow automation:</b> enquiries, approvals, accounts and payment links handled in order, with you approving each step</span></li>
@@ -331,7 +355,8 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
             <li><span><b>Payment setup:</b> one-time and monthly payment links for your customers</span></li>
           </ul>
         </article>
-        <article class="service">
+        <article class="service rv">
+          <div class="svc-art" data-art="globe"></div>
           <h3>Website and brand</h3>
           <ul>
             <li><span><b>Business websites</b> that are fast and mobile-first, on your own domain, with business email set up</span></li>
@@ -341,7 +366,7 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
         </article>
       </div>
       <div class="closing">
-        <p>Every project starts with a free conversation about where your business loses time.</p>
+        <p data-type>Every project starts with a free conversation about where your business loses time.</p>
         <a class="btn primary" href="mailto:customersupport@carbonailabs.in?subject=A%20problem%20in%20my%20business">Tell us about your problem</a>
       </div>
     </div>
@@ -349,18 +374,18 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 
   <section class="block about" id="about">
     <div class="wrap">
-      <div class="copy">
+      <div class="copy rv">
         <span class="eyebrow">About</span>
         <h2 style="font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:800;line-height:1.1;color:var(--carbon)">A lab for real business problems</h2>
         <p>Carbon AI Labs was founded in Chennai in October 2026 by Ajay Andrews to research and develop solutions to business problems with artificial intelligence.</p>
         <p>Most businesses lose hours to work that is slow, repetitive and easy to get wrong. We study how that work is done today, then build AI systems that do it with more speed and accuracy, so owners can make better decisions and earn more from the time they have.</p>
         <p>Our first products serve gyms and independent coaches across India. If your business has a problem that eats your team's time, we would like to hear about it.</p>
       </div>
-      <dl class="principles">
-        <div><dt>Problem first</dt><dd>We start from where a business loses time and money, not from the technology.</dd></div>
-        <div><dt>People decide</dt><dd>Sensitive calls go to a person. In our fitness apps, any injury, medication, pain or age flag goes to a coach.</dd></div>
-        <div><dt>Rules you can check</dt><dd>Our systems show their reasoning, and every rule names the source it comes from.</dd></div>
-        <div><dt>Measured in results</dt><dd>We judge our work by time saved, errors avoided and revenue gained.</dd></div>
+      <dl class="principles" data-stagger>
+        <div class="rv"><dt>Problem first</dt><dd>We start from where a business loses time and money, not from the technology.</dd></div>
+        <div class="rv"><dt>People decide</dt><dd>Sensitive calls go to a person. In our fitness apps, any injury, medication, pain or age flag goes to a coach.</dd></div>
+        <div class="rv"><dt>Rules you can check</dt><dd>Our systems show their reasoning, and every rule names the source it comes from.</dd></div>
+        <div class="rv"><dt>Measured in results</dt><dd>We judge our work by time saved, errors avoided and revenue gained.</dd></div>
       </dl>
     </div>
   </section>
@@ -368,7 +393,7 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
   <section class="block contact" id="contact">
     <div class="wrap card">
       <div>
-        <div class="head" style="margin-bottom:0">
+        <div class="head rv" style="margin-bottom:0">
           <span class="eyebrow">Contact</span>
           <h2>Talk to us</h2>
           <p>Business owners, coaches, gyms and partners can email or call us directly. We usually reply within one working day.</p>
@@ -382,7 +407,7 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
           <button class="copy-btn" type="button" data-copy="phone">Copy</button>
         </div>
       </div>
-      <dl class="facts">
+      <dl class="facts rv" style="--i:1">
         <div><dt>Company</dt><dd>Carbon AI Labs</dd></div>
         <div><dt>Founder</dt><dd>Ajay Andrews</dd></div>
         <div><dt>Email</dt><dd>customersupport@carbonailabs.in</dd></div>
