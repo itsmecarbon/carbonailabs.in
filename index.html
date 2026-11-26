@@ -200,7 +200,10 @@ footer img{height:40px;width:auto;display:block;margin-left:-8px}
 .top nav .studio-link,.top nav .desk-link{background:#fff;color:var(--carbon);border:1px solid var(--line);padding:.4rem .8rem;font-weight:500;box-shadow:0 1px 2px rgba(28,27,31,.04)}
 .top nav .studio-link:hover{color:var(--carbon);border-color:#F5C518;background:#FFFCF0}
 .top nav .desk-link:hover{color:var(--carbon);border-color:#38BDF8;background:#F2FAFE}
-@media (max-width:560px){.top nav .studio-link + .desk-link{margin-left:0}.top nav .desk-link{margin-right:0}.top nav .desk-link::after{display:none}}
+/* both products in one grouped capsule with a hairline divider */
+.top nav .studio-link{border-radius:999px 0 0 999px;border-right:0;padding-right:.85rem}
+.top nav .studio-link + .desk-link{margin-left:-1.5rem;border-radius:0 999px 999px 0;padding-left:.85rem;box-shadow:inset 1px 0 0 var(--line),0 1px 2px rgba(28,27,31,.04)}
+@media (max-width:560px){.top nav .studio-link + .desk-link{margin-left:-.6rem}.top nav .desk-link{margin-right:0}.top nav .desk-link::after{display:none}}
 </style>
 
 <header class="top">
