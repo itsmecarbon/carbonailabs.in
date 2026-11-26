@@ -124,7 +124,7 @@
     var ink = canvas.getAttribute('data-ink') || '242,240,234';
     var acc = canvas.getAttribute('data-acc') || '245,197,24';
     var strength = parseFloat(canvas.getAttribute('data-alpha') || '0.34');
-    var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 1.5), running = false, raf = 0, last = 0, t0 = performance.now();
+    var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2), running = false, raf = 0, last = 0, t0 = performance.now();
     function size() {
       var r = canvas.getBoundingClientRect();
       w = Math.max(1, r.width); h = Math.max(1, r.height);
@@ -143,10 +143,12 @@
     }
     function draw(t) {
       ctx.clearRect(0, 0, w, h);
-      var R = w < 600 ? 22 : 30, hw = Math.sqrt(3) * R, vh = 1.5 * R;
+      var small = w < 600, R = small ? 26 : 30, hw = Math.sqrt(3) * R, vh = 1.5 * R;
       // wave source drifts slowly around the upper right
-      var ox = w * (0.78 + 0.08 * Math.sin(t * 0.00008)), oy = h * (0.3 + 0.12 * Math.cos(t * 0.00007));
-      var diag = Math.sqrt(w * w + h * h);
+      // on phones the hero is tall and narrow: keep the source inside the first screen, nearer the middle
+      var ox = small ? w * (0.62 + 0.18 * Math.sin(t * 0.00008)) : w * (0.78 + 0.08 * Math.sin(t * 0.00008));
+      var oy = small ? Math.min(h, 700) * (0.38 + 0.1 * Math.cos(t * 0.00007)) : h * (0.3 + 0.12 * Math.cos(t * 0.00007));
+      var diag = small ? 640 : Math.sqrt(w * w + h * h);
       ctx.lineWidth = 1;
       for (var row = -1, cy = -vh; cy < h + vh; row++, cy += vh) {
         for (var cx = (row % 2 ? hw / 2 : 0) - hw; cx < w + hw; cx += hw) {
@@ -173,7 +175,18 @@
     function start() { if (running || reduce) return; running = true; raf = requestAnimationFrame(loop); }
     function stop() { running = false; cancelAnimationFrame(raf); }
     size(); draw(9000);
-    window.addEventListener('resize', function () { size(); draw(performance.now() - t0); });
+    // only redraw on a real size change: phone browsers fire resize while the address bar slides,
+    // which used to clear the canvas mid-scroll and made the hexagons jump
+    var lastW = 0, lastH = 0;
+    function onResize() {
+      var rct = canvas.getBoundingClientRect();
+      if (Math.abs(rct.width - lastW) < 2 && Math.abs(rct.height - lastH) < 80) return;
+      lastW = rct.width; lastH = rct.height;
+      size(); draw(performance.now() - t0);
+    }
+    lastW = w; lastH = h;
+    if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(canvas);
+    else window.addEventListener('resize', onResize);
     if (!reduce && 'IntersectionObserver' in window) {
       new IntersectionObserver(function (es) { es.forEach(function (e) { e.isIntersecting ? start() : stop(); }); }).observe(canvas);
       document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });

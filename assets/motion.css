@@ -22,7 +22,10 @@ html.motion .grow-x.in{transform:none}
           mask-image:radial-gradient(120% 90% at 78% 40%,#000 25%,transparent 78%)}
 .has-wave{position:relative;isolation:isolate}
 .has-wave > .wrap{position:relative;z-index:1}
-@media (max-width:720px){.wave{opacity:.6}}
+@media (max-width:720px){
+  .wave{opacity:.85;-webkit-mask-image:radial-gradient(130% 55% at 65% 30%,#000 30%,transparent 80%);mask-image:radial-gradient(130% 55% at 65% 30%,#000 30%,transparent 80%)}
+  .has-wave > svg.ring{display:none} /* one hexagon motif on small screens: the moving field */
+}
 
 /* self-drawing line art */
 .art{display:block;width:100%;max-width:220px;height:auto;color:var(--art-ink);overflow:visible}
