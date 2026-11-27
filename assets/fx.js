@@ -2,7 +2,8 @@
    Turns on when <html data-fx="labs|studio|desk">.
    - hero: eclipse horizon that rises and brightens as you scroll, light beams, pointer light
    - hero h1: words arrive out of a blur
-   - [data-fx-tilt] (finder panel, product grids): starts tilted back, flattens as it scrolls in
+   - [data-fx-tilt] (finder panel, product grids): starts tilted back, flattens as it scrolls in;
+     the hero panel then grows 4% and lifts 40px as the hero scrolls away (desktop)
    - cards: spotlight and border glow that follow the pointer
    - main buttons: lean a few pixels toward the pointer
    - thin scroll progress bar, glass header that firms up after scrolling
@@ -112,17 +113,23 @@
       var y = window.scrollY || window.pageYOffset, vh = window.innerHeight, max = document.documentElement.scrollHeight - vh;
       bar.style.setProperty('--sp', max > 0 ? clamp(y / max, 0, 1).toFixed(4) : 0);
       if (top) top.classList.toggle('fx-scrolled', y > 12);
+      var hp = 0;
       if (hero && !reduce) {
         var hh = hero.offsetHeight || 1;
-        hero.style.setProperty('--p', clamp(y / (hh * 0.8), 0, 1).toFixed(3));
+        hp = clamp(y / (hh * 0.8), 0, 1);
+        hero.style.setProperty('--p', hp.toFixed(3));
       }
+      var wide = window.innerWidth > 720;
       for (var i = 0; i < tilts.length; i++) {
         var t = tilts[i], r = t.getBoundingClientRect();
         var q = clamp((vh - r.top) / (vh * 0.75), 0, 1);  // 0 just below the fold, 1 well inside
-        if (q >= 1) { t.style.rotate = ''; t.style.scale = ''; continue; }
+        // the hero's app panel then comes toward you as the page scrolls (RedSun: +5% and ~57px up over the hero)
+        var lift = wide && hero && hero.contains(t) ? hp : 0;
         var ease = 1 - Math.pow(1 - q, 3);
-        t.style.rotate = 'x ' + ((1 - ease) * 16).toFixed(2) + 'deg';
-        t.style.scale = (0.94 + 0.06 * ease).toFixed(4);
+        t.style.rotate = q >= 1 ? '' : 'x ' + ((1 - ease) * 16).toFixed(2) + 'deg';
+        var sc = (0.94 + 0.06 * ease) * (1 + 0.04 * lift);
+        t.style.scale = Math.abs(sc - 1) < 0.0005 ? '' : sc.toFixed(4);
+        t.style.translate = lift ? '0 ' + (-40 * lift).toFixed(1) + 'px' : '';
       }
     }
     function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }

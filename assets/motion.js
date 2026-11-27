@@ -8,7 +8,9 @@
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var root = document.documentElement;
-  if (!reduce && 'IntersectionObserver' in window) root.classList.add('motion');
+  // data-motion-off: the head script gave up waiting for this file (very slow load), so keep the page still
+  if (!reduce && 'IntersectionObserver' in window && !root.hasAttribute('data-motion-off')) root.classList.add('motion');
+  window.__motionReady = true; // the head script hid content early; tell it motion.js is running
 
   var SVGNS = 'http://www.w3.org/2000/svg';
   var ART = {
@@ -212,11 +214,16 @@
 
     if (!root.classList.contains('motion')) return;
     var targets = document.querySelectorAll('.rv, .rv-fade, .grow-x, .art, [data-type]');
+    var lateSet = false;
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (!e.isIntersecting) return;
+        // hero load sequence is timed from navigation (as in the reference): take off the time the page
+        // needed to get here, at most 450ms, so a slow phone still sees the whole sequence
+        if (!lateSet && e.target.closest('.hero')) { lateSet = true; root.style.setProperty('--late', Math.min(450, Math.round(performance.now())) + 'ms'); }
         e.target.classList.add('in');
-        if (e.target._start) { var s = e.target._start; e.target._start = null; setTimeout(s, 350); }
+        // in the hero, wait for the panel holding the line to finish arriving (RedSun load sequence)
+        if (e.target._start) { var s = e.target._start; e.target._start = null; setTimeout(s, e.target.closest('.hero') ? 1500 : 350); }
         io.unobserve(e.target);
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
