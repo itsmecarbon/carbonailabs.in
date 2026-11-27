@@ -65,36 +65,38 @@
   function typeOut(el) {
     var full = el.textContent.replace(/\s+/g, ' ').trim();
     if (reduce) return;
-    var h = el.getBoundingClientRect().height;
-    el.style.minHeight = h + 'px';
     var visual = document.createElement('span');
     visual.setAttribute('aria-hidden', 'true');
     while (el.firstChild) visual.appendChild(el.firstChild);
-    // collect text nodes and blank them, keeping the inner spans (colours) intact
-    var nodes = [], walker = document.createTreeWalker(visual, NodeFilter.SHOW_TEXT, null);
-    while (walker.nextNode()) nodes.push({ n: walker.currentNode, t: walker.currentNode.nodeValue });
-    nodes.forEach(function (o) { o.n.nodeValue = ''; });
+    // wrap every character in a hidden span: the heading is laid out at its FINAL line breaks
+    // from the start, so typing never makes a word jump down to the next line
+    var chars = [], walker = document.createTreeWalker(visual, NodeFilter.SHOW_TEXT, null), texts = [];
+    while (walker.nextNode()) texts.push(walker.currentNode);
+    texts.forEach(function (t) {
+      var frag = document.createDocumentFragment();
+      t.nodeValue.replace(/\s+/g, ' ').split('').forEach(function (c) {
+        var s = document.createElement('span'); s.className = 'tc'; s.textContent = c; frag.appendChild(s); chars.push(s);
+      });
+      t.parentNode.replaceChild(frag, t);
+    });
     var sr = document.createElement('span');
     sr.className = 'sr-only';
     sr.textContent = full;
-    var caret = document.createElement('span');
-    caret.className = 'caret';
-    caret.setAttribute('aria-hidden', 'true');
     el.appendChild(sr);
     el.appendChild(visual);
     el.classList.add('typed');
-    var idx = 0, ch = 0;
-    nodes.length && nodes[0].n.parentNode.appendChild(caret);
+    // the blinking cursor is drawn by the newest character (.cur::after), never as its own box,
+    // so it can not open a line break in the middle of a word
+    if (chars.length) chars[0].className = 'tc pre';
     el._start = function () {
-      var speed = Math.max(18, Math.min(42, 1600 / full.length));
+      var speed = Math.max(18, Math.min(42, 1600 / full.length)), i = 0, prev = chars[0];
       (function step() {
-        if (idx >= nodes.length) { setTimeout(function () { caret.remove(); el.style.minHeight = ''; }, 2600); return; }
-        var o = nodes[idx];
-        ch++;
-        o.n.nodeValue = o.t.slice(0, ch);
-        if (o.n.parentNode !== caret.parentNode || caret.previousSibling !== o.n) o.n.parentNode.insertBefore(caret, o.n.nextSibling);
-        if (ch >= o.t.length) { idx++; ch = 0; }
-        setTimeout(step, o.t.charAt(ch - 1) === ' ' ? speed * 0.6 : speed);
+        if (i >= chars.length) { setTimeout(function () { if (prev) prev.className = 'tc on'; }, 2600); return; }
+        var c = chars[i++];
+        if (prev && prev !== c) prev.className = 'tc on';
+        c.className = 'tc on cur';
+        prev = c;
+        setTimeout(step, c.textContent === ' ' ? speed * 0.6 : speed);
       })();
     };
   }
