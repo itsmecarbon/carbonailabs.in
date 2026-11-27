@@ -8,7 +8,9 @@
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var root = document.documentElement;
-  if (!reduce && 'IntersectionObserver' in window) root.classList.add('motion');
+  // data-motion-off: the head script gave up waiting for this file (very slow load), so keep the page still
+  if (!reduce && 'IntersectionObserver' in window && !root.hasAttribute('data-motion-off')) root.classList.add('motion');
+  window.__motionReady = true; // the head script hid content early; tell it motion.js is running
 
   var SVGNS = 'http://www.w3.org/2000/svg';
   var ART = {
@@ -65,36 +67,38 @@
   function typeOut(el) {
     var full = el.textContent.replace(/\s+/g, ' ').trim();
     if (reduce) return;
-    var h = el.getBoundingClientRect().height;
-    el.style.minHeight = h + 'px';
     var visual = document.createElement('span');
     visual.setAttribute('aria-hidden', 'true');
     while (el.firstChild) visual.appendChild(el.firstChild);
-    // collect text nodes and blank them, keeping the inner spans (colours) intact
-    var nodes = [], walker = document.createTreeWalker(visual, NodeFilter.SHOW_TEXT, null);
-    while (walker.nextNode()) nodes.push({ n: walker.currentNode, t: walker.currentNode.nodeValue });
-    nodes.forEach(function (o) { o.n.nodeValue = ''; });
+    // wrap every character in a hidden span: the heading is laid out at its FINAL line breaks
+    // from the start, so typing never makes a word jump down to the next line
+    var chars = [], walker = document.createTreeWalker(visual, NodeFilter.SHOW_TEXT, null), texts = [];
+    while (walker.nextNode()) texts.push(walker.currentNode);
+    texts.forEach(function (t) {
+      var frag = document.createDocumentFragment();
+      t.nodeValue.replace(/\s+/g, ' ').split('').forEach(function (c) {
+        var s = document.createElement('span'); s.className = 'tc'; s.textContent = c; frag.appendChild(s); chars.push(s);
+      });
+      t.parentNode.replaceChild(frag, t);
+    });
     var sr = document.createElement('span');
     sr.className = 'sr-only';
     sr.textContent = full;
-    var caret = document.createElement('span');
-    caret.className = 'caret';
-    caret.setAttribute('aria-hidden', 'true');
     el.appendChild(sr);
     el.appendChild(visual);
     el.classList.add('typed');
-    var idx = 0, ch = 0;
-    nodes.length && nodes[0].n.parentNode.appendChild(caret);
+    // the blinking cursor is drawn by the newest character (.cur::after), never as its own box,
+    // so it can not open a line break in the middle of a word
+    if (chars.length) chars[0].className = 'tc pre';
     el._start = function () {
-      var speed = Math.max(18, Math.min(42, 1600 / full.length));
+      var speed = Math.max(18, Math.min(42, 1600 / full.length)), i = 0, prev = chars[0];
       (function step() {
-        if (idx >= nodes.length) { setTimeout(function () { caret.remove(); el.style.minHeight = ''; }, 2600); return; }
-        var o = nodes[idx];
-        ch++;
-        o.n.nodeValue = o.t.slice(0, ch);
-        if (o.n.parentNode !== caret.parentNode || caret.previousSibling !== o.n) o.n.parentNode.insertBefore(caret, o.n.nextSibling);
-        if (ch >= o.t.length) { idx++; ch = 0; }
-        setTimeout(step, o.t.charAt(ch - 1) === ' ' ? speed * 0.6 : speed);
+        if (i >= chars.length) { setTimeout(function () { if (prev) prev.className = 'tc on'; }, 2600); return; }
+        var c = chars[i++];
+        if (prev && prev !== c) prev.className = 'tc on';
+        c.className = 'tc on cur';
+        prev = c;
+        setTimeout(step, c.textContent === ' ' ? speed * 0.6 : speed);
       })();
     };
   }
@@ -210,11 +214,16 @@
 
     if (!root.classList.contains('motion')) return;
     var targets = document.querySelectorAll('.rv, .rv-fade, .grow-x, .art, [data-type]');
+    var lateSet = false;
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (!e.isIntersecting) return;
+        // hero load sequence is timed from navigation (as in the reference): take off the time the page
+        // needed to get here, at most 450ms, so a slow phone still sees the whole sequence
+        if (!lateSet && e.target.closest('.hero')) { lateSet = true; root.style.setProperty('--late', Math.min(450, Math.round(performance.now())) + 'ms'); }
         e.target.classList.add('in');
-        if (e.target._start) { var s = e.target._start; e.target._start = null; setTimeout(s, 350); }
+        // in the hero, wait for the panel holding the line to finish arriving (RedSun load sequence)
+        if (e.target._start) { var s = e.target._start; e.target._start = null; setTimeout(s, e.target.closest('.hero') ? 1500 : 350); }
         io.unobserve(e.target);
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });

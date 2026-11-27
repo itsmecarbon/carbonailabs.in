@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-fx="desk">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -30,8 +30,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <script src="/assets/analytics.js" defer></script>
+<script>/* hide reveal targets before first paint (no flash); motion.js sets __motionReady, else unhide after 3s */(function(d){if(window.matchMedia&&matchMedia("(prefers-reduced-motion: no-preference)").matches&&"IntersectionObserver"in window){d.classList.add("motion");setTimeout(function(){if(!window.__motionReady){d.classList.remove("motion");d.setAttribute("data-motion-off","")}},3000)}})(document.documentElement)</script>
 <link rel="stylesheet" href="/assets/motion.css">
 <script src="/assets/motion.js" defer></script>
+<link rel="stylesheet" href="/assets/fx.css">
+<script src="/assets/fx.js" defer></script>
 <style>
 /* Carbon AI Desk: black + Sky Blue, the same layout as Carbon AI Studio (which is black + yellow). */
 :root{
@@ -296,7 +299,7 @@ footer a:hover{color:var(--gold)}
         <a class="btn ghost" href="#desks">Meet Studio Desk</a>
       </div>
 
-      <div class="finder rv" style="--i:3">
+      <div class="finder rv" style="--i:3" data-fx-tilt>
         <i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i>
         <div class="kicker">IT and AI services · Chennai</div>
         <h2 data-type>Your whole business, <span class="y">on one screen.</span></h2>
@@ -324,7 +327,7 @@ footer a:hover{color:var(--gold)}
         <p>Each desk is built around how one kind of business really works: its clients, its calendar, its money and its team. Studio Desk is ready for photography studios today. More desks are on the way.</p>
       </div>
 
-      <div class="editions">
+      <div class="editions" data-fx-tilt>
         <article class="edition main">
           <div class="label"><span class="chip on">First product</span><span class="chip">Photography</span></div>
           <h3>Studio Desk</h3>
@@ -420,7 +423,7 @@ footer a:hover{color:var(--gold)}
         <div class="kicker">Our promises</div>
         <h2>Simple to use, <span class="y">and you stay in charge.</span></h2>
       </div>
-      <div class="promises" data-stagger>
+      <div class="promises" data-stagger data-fx-tilt>
         <article class="promise rv"><span class="k">01</span><h3>Plain language</h3><p>We talk about your clients, your bookings and your money, never in tech terms.</p></article>
         <article class="promise rv"><span class="k">02</span><h3>Start small</h3><p>Begin with the dashboard and add BI or automation only when you are ready.</p></article>
         <article class="promise rv"><span class="k">03</span><h3>You stay in charge</h3><p>Automation drafts and reminds. A person approves anything that matters.</p></article>
